@@ -40,7 +40,7 @@ jobs:
       run:
         shell: bash
     env:
-      PYTHON_PACKAGE_NAME: "your pythohn pacakge"
+      PYTHON_PACKAGE_NAME: YOUR_PYTHON_PACKAGE_NAME
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
