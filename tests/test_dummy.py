@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import unittest
 
 
 class TestDummy(unittest.TestCase):
+    """Test dummy."""
 
     def test_dummy(self):
+        """Test dummy."""
         self.assertEqual(1, 2)
