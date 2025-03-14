@@ -11,6 +11,9 @@ jobs:
     defaults:
       run:
         shell: bash
+    env:
+      PYTHON_PACKAGE_NAME: YOUR_PYTHON_PACKAGE_NAME
+      PYTHON_NAME_SPACE: YOUR_PYTHON_NAME_SPACE
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -53,4 +56,4 @@ jobs:
           python3 -m pip install -U "${{ env.PYTHON_PACKAGE_NAME}}"
       - name: Test package
         run: |
-          python -c 'import langchain_lightdash; print(langchain_lightdash.__version__)'
+          uv run python -m "${{ env.PYTHON_NAME_SPACE }}"

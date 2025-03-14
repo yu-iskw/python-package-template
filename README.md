@@ -1,3 +1,1 @@
-# langchain-lightdash
-
-LangChain tools for Lightdash API
+# {{ project_name}}

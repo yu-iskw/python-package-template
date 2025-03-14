@@ -16,4 +16,5 @@
 
 set -Eo pipefail
 
-python -m build
+# Build the package
+uv build --verbose
