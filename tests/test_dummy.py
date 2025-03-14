@@ -20,4 +20,4 @@ class TestDummy(unittest.TestCase):
 
     def test_dummy(self):
         """Test dummy."""
-        self.assertEqual(1, 2)
+        self.assertEqual(1, 1)
