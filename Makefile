@@ -49,21 +49,21 @@ test:
 # Build the package
 .PHONY: build
 build:
-	bash -x ./dev/build.sh
+	uv run bash -x ./dev/build.sh
 
 # Clean the environment
 .PHONY: clean
 clean:
-	bash ./dev/clean.sh
+	uv run bash ./dev/clean.sh
 
 all: clean lint test build
 
 # Publish to pypi
 .PHONY: publish
 publish:
-	bash ./dev/publish.sh "pypi"
+	uv run bash ./dev/publish.sh "pypi"
 
 # Publish to testpypi
 .PHONY: test-publish
 test-publish:
-	bash ./dev/publish.sh "testpypi"
+	uv run bash ./dev/publish.sh "testpypi"
