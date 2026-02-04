@@ -9,6 +9,7 @@ This reference documents patterns for executing tasks in parallel using Claude C
 ### Task Independence
 
 Tasks are independent when:
+
 - They modify different files
 - They don't share mutable state
 - Output of one is not input to another
@@ -17,7 +18,7 @@ Tasks are independent when:
 
 Each file should be "owned" by exactly one parallel task:
 
-```
+```text
 ✓ Good: Task A owns src/api.py, Task B owns src/db.py
 ✗ Bad: Task A and B both modify src/shared.py
 ```
@@ -25,6 +26,7 @@ Each file should be "owned" by exactly one parallel task:
 ### Execution Phases
 
 Group tasks into phases:
+
 - **Same phase**: Tasks run in parallel (must be independent)
 - **Different phases**: Tasks run sequentially (can have dependencies)
 
@@ -34,7 +36,7 @@ Group tasks into phases:
 
 Split work by module/component:
 
-```
+```text
 Phase 1 (Parallel):
 ├── Agent A: src/api/* (API endpoints)
 ├── Agent B: src/db/* (Database layer)
@@ -50,7 +52,7 @@ Phase 2 (Sequential):
 
 Split work by software layer:
 
-```
+```text
 Phase 1 (Sequential):
 └── Agent A: Implementation (src/)
 
@@ -66,7 +68,7 @@ Phase 2 (Parallel):
 
 Split work by independent features:
 
-```
+```text
 Phase 1 (Parallel):
 ├── Agent A: Feature X (all X-related files)
 ├── Agent B: Feature Y (all Y-related files)
@@ -82,11 +84,11 @@ Phase 2 (Sequential):
 
 Parallel analysis, sequential modifications:
 
-```
+```text
 Phase 1 (Parallel):
 ├── Agent A: Analyze module 1 → produce plan
 ├── Agent B: Analyze module 2 → produce plan
-└── Agent C: Analyze module 3 → produce plan
+├── Agent C: Analyze module 3 → produce plan
 
 Phase 2 (Sequential):
 └── Agent D: Apply all plans (has all context)
@@ -100,7 +102,7 @@ Phase 2 (Sequential):
 
 To run tasks in parallel, include multiple Task calls in ONE message:
 
-```
+```text
 Message contains:
 - Task call 1: run_in_background=true
 - Task call 2: run_in_background=true
@@ -113,7 +115,7 @@ All three launch simultaneously.
 
 For sequential execution, wait for each task to complete:
 
-```
+```text
 Message 1: Task call (foreground, wait for completion)
 Message 2: Task call (foreground, wait for completion)
 Message 3: Task call (foreground, wait for completion)
@@ -149,6 +151,7 @@ for task_id, files in files_by_task.items():
 ### Runtime Detection
 
 If a worker agent needs a file not assigned:
+
 1. Stop immediately
 2. Report the conflict
 3. Re-plan with correct file assignments
@@ -173,17 +176,17 @@ If a worker agent needs a file not assigned:
 
 ## Quick Reference
 
-| Scenario | Approach |
-|----------|----------|
-| Independent modules | Parallel in same phase |
-| Shared utility file | Sequential or single owner |
-| Tests after implementation | Separate phase |
-| Multiple features | Parallel if no shared files |
-| Refactoring | Often sequential (ripple effects) |
+| Scenario                   | Approach                          |
+| -------------------------- | --------------------------------- |
+| Independent modules        | Parallel in same phase            |
+| Shared utility file        | Sequential or single owner        |
+| Tests after implementation | Separate phase                    |
+| Multiple features          | Parallel if no shared files       |
+| Refactoring                | Often sequential (ripple effects) |
 
 ## Example: Full Execution Flow
 
-```
+```text
 1. User: "Add logging to API, DB, and utils modules"
 
 2. Planner produces:

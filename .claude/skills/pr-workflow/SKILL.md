@@ -14,16 +14,19 @@ A complete workflow for creating, developing, and submitting pull requests follo
 ### Phase 1: Branch Setup
 
 1. **Ensure clean state**:
+
    ```bash
    git status
    ```
 
 2. **Create feature branch**:
+
    ```bash
    git checkout -b <type>/<description>
    ```
 
    Branch naming convention:
+
    - `feat/<description>` - New features
    - `fix/<description>` - Bug fixes
    - `docs/<description>` - Documentation
@@ -48,6 +51,7 @@ Before creating PR, run full verification:
    Use the `verifier` subagent to run complete build → lint → test cycle
 
 2. **Review changes**:
+
    ```bash
    git diff main...HEAD
    ```
@@ -58,6 +62,7 @@ Before creating PR, run full verification:
 ### Phase 4: Commit Changes
 
 1. **Stage files**:
+
    ```bash
    git add <specific-files>
    ```
@@ -65,11 +70,13 @@ Before creating PR, run full verification:
    Avoid `git add -A` - be explicit about what's committed.
 
 2. **Create commit**:
+
    ```bash
    git commit -m "type(scope): description"
    ```
 
    Conventional commit types:
+
    - `feat`: New feature
    - `fix`: Bug fix
    - `docs`: Documentation
@@ -81,11 +88,13 @@ Before creating PR, run full verification:
 ### Phase 5: Create Pull Request
 
 1. **Push branch**:
+
    ```bash
    git push -u origin <branch-name>
    ```
 
 2. **Create PR using gh CLI**:
+
    ```bash
    gh pr create --title "type(scope): description" --body "$(cat <<'EOF'
    ## Summary
@@ -110,20 +119,24 @@ Before creating PR, run full verification:
 
 ```markdown
 ## Summary
+
 [1-3 sentences describing what this PR does and why]
 
 ## Changes
+
 - [Specific change 1]
 - [Specific change 2]
 - [Specific change 3]
 
 ## Testing
+
 - [ ] All tests pass (`make test`)
 - [ ] Linting passes (`make lint`)
 - [ ] Build succeeds (`make build`)
 - [ ] Manual testing completed (if applicable)
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated (if needed)
@@ -132,17 +145,17 @@ Before creating PR, run full verification:
 
 ## Quick Commands Reference
 
-| Task | Command |
-|------|---------|
-| Check branch status | `git status` |
-| View changes | `git diff` |
-| Stage all changes | `git add -A` |
-| Stage specific file | `git add <file>` |
-| Commit changes | `git commit -m "message"` |
-| Push branch | `git push -u origin <branch>` |
-| Create PR | `gh pr create` |
-| View PR status | `gh pr status` |
-| List open PRs | `gh pr list` |
+| Task                | Command                       |
+| ------------------- | ----------------------------- |
+| Check branch status | `git status`                  |
+| View changes        | `git diff`                    |
+| Stage all changes   | `git add -A`                  |
+| Stage specific file | `git add <file>`              |
+| Commit changes      | `git commit -m "message"`     |
+| Push branch         | `git push -u origin <branch>` |
+| Create PR           | `gh pr create`                |
+| View PR status      | `gh pr status`                |
+| List open PRs       | `gh pr list`                  |
 
 ## Troubleshooting
 

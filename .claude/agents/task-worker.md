@@ -22,6 +22,7 @@ You are a focused worker agent executing a specific subtask as part of a larger 
 ### 1. Understand Your Task
 
 Parse the task prompt for:
+
 - **Objective**: What you need to accomplish
 - **Assigned files**: Files you are allowed to modify
 - **Context**: Background information needed
@@ -31,7 +32,7 @@ Parse the task prompt for:
 
 Before making ANY changes:
 
-```
+```text
 Assigned files from prompt:
 - file1.py ✓
 - file2.py ✓
@@ -125,7 +126,8 @@ Even though you're a subtask worker, maintain quality:
 ## Example Task Execution
 
 **Task Prompt**:
-```
+
+```text
 Task ID: task-1a
 Objective: Create the User model with authentication fields
 Assigned Files:
@@ -143,6 +145,7 @@ Context: Part of JWT authentication implementation
 5. ✓ Output completion report
 
 **Completion Report**:
+
 ```yaml
 task_completion_report:
   task_id: "task-1a"

@@ -12,6 +12,7 @@ This skill enables Claude Code to evolve and improve its own configuration based
 ## When to Use
 
 Invoke this skill when:
+
 - You've explained the same concept to Claude multiple times
 - Claude repeatedly makes the same type of mistake
 - A new workflow pattern has emerged that should be automated
@@ -42,13 +43,13 @@ cat .claude/settings.json | jq '.hooks'
 
 Based on user input or observed patterns, determine what type of improvement is needed:
 
-| Pattern | Action |
-|---------|--------|
-| Repeated explanation | Add to CLAUDE.md or create a skill |
-| Recurring mistake | Add rule to CLAUDE.md |
-| Manual repetitive task | Create a hook |
-| Complex workflow | Create a skill |
-| Specialized task delegation | Create an agent |
+| Pattern                     | Action                             |
+| --------------------------- | ---------------------------------- |
+| Repeated explanation        | Add to CLAUDE.md or create a skill |
+| Recurring mistake           | Add rule to CLAUDE.md              |
+| Manual repetitive task      | Create a hook                      |
+| Complex workflow            | Create a skill                     |
+| Specialized task delegation | Create an agent                    |
 
 ### 3. Implement Improvement
 
@@ -120,7 +121,6 @@ description: What this agent specializes in
 tools: Read, Grep, Glob
 model: sonnet
 ---
-
 # Agent Role Description
 
 Instructions for the agent...
@@ -137,6 +137,7 @@ After making changes:
 ### 5. Document the Change
 
 Add a comment in the relevant file explaining:
+
 - What was changed
 - Why it was changed
 - What problem it solves
@@ -179,6 +180,7 @@ Add a comment in the relevant file explaining:
 ## Self-Evolution Metrics
 
 Track improvement effectiveness:
+
 - Fewer repeated explanations needed
 - Fewer manual corrections required
 - More autonomous task completion

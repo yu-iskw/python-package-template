@@ -22,6 +22,7 @@ make build
 ```
 
 **If build fails:**
+
 1. Analyze the error output
 2. Identify the root cause (missing dependencies, syntax errors, import issues)
 3. Attempt to fix if straightforward
@@ -43,6 +44,7 @@ trunk check -a
 ```
 
 **If lint fails:**
+
 1. Analyze the violations
 2. Run auto-fix:
    ```bash
@@ -67,6 +69,7 @@ uv run pytest -v
 ```
 
 **If tests fail:**
+
 1. Identify failing tests
 2. Analyze failure reasons
 3. Determine if it's a code bug or test bug
@@ -82,16 +85,19 @@ Provide a structured verification report:
 ## Verification Report
 
 ### Build
+
 - Status: PASS | FIXED | FAIL
 - Details: {any relevant information}
 
 ### Lint
+
 - Status: PASS | FIXED | FAIL
 - Violations found: {count}
 - Auto-fixed: {count}
 - Remaining issues: {list if any}
 
 ### Tests
+
 - Status: PASS | FIXED | FAIL
 - Tests run: {count}
 - Passed: {count}
@@ -99,6 +105,7 @@ Provide a structured verification report:
 - Failed tests: {list if any}
 
 ### Overall
+
 - Verification: PASS | PARTIAL | FAIL
 - Action required: {yes/no}
 - Issues requiring human intervention:

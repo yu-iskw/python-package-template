@@ -2,7 +2,7 @@
 
 ## Directory Structure
 
-```
+```text
 .claude/
 ├── settings.json          # Hooks, permissions, environment
 ├── settings.local.json    # Personal overrides (gitignored)
@@ -21,6 +21,7 @@
 ### CLAUDE.md (Project Root)
 
 Project memory that loads at session start. Contains:
+
 - Quick commands
 - Code style conventions
 - Testing workflow
@@ -51,36 +52,36 @@ Configuration for hooks, permissions, and environment:
 
 ## Available Skills
 
-| Skill | Invoke With | Purpose |
-|-------|-------------|---------|
-| initialize-project | `/initialize-project` | Bootstrap from template |
-| setup-dev-env | `/setup-dev-env` | Set up development environment |
-| lint-and-fix | `/lint-and-fix` | Auto-fix linting issues |
-| test-and-fix | `/test-and-fix` | Fix failing tests |
-| build-and-fix | `/build-and-fix` | Fix build errors |
-| clean-project | `/clean-project` | Hard reset environment |
-| python-upgrade | `/python-upgrade` | Upgrade dependencies |
-| security-vulnerability-audit | `/security-vulnerability-audit` | Security scanning |
-| improve-claude-config | `/improve-claude-config` | Self-improvement |
-| pr-workflow | `/pr-workflow` | PR creation workflow |
-| fix-issue | `/fix-issue <number>` | Fix GitHub issues |
+| Skill                        | Invoke With                     | Purpose                        |
+| ---------------------------- | ------------------------------- | ------------------------------ |
+| initialize-project           | `/initialize-project`           | Bootstrap from template        |
+| setup-dev-env                | `/setup-dev-env`                | Set up development environment |
+| lint-and-fix                 | `/lint-and-fix`                 | Auto-fix linting issues        |
+| test-and-fix                 | `/test-and-fix`                 | Fix failing tests              |
+| build-and-fix                | `/build-and-fix`                | Fix build errors               |
+| clean-project                | `/clean-project`                | Hard reset environment         |
+| python-upgrade               | `/python-upgrade`               | Upgrade dependencies           |
+| security-vulnerability-audit | `/security-vulnerability-audit` | Security scanning              |
+| improve-claude-config        | `/improve-claude-config`        | Self-improvement               |
+| pr-workflow                  | `/pr-workflow`                  | PR creation workflow           |
+| fix-issue                    | `/fix-issue <number>`           | Fix GitHub issues              |
 
 ## Available Agents
 
-| Agent | Description | Tools |
-|-------|-------------|-------|
-| verifier | Run build → lint → test cycle | All |
+| Agent         | Description                      | Tools                  |
+| ------------- | -------------------------------- | ---------------------- |
+| verifier      | Run build → lint → test cycle    | All                    |
 | code-reviewer | Review code quality and security | Read, Grep, Glob, Bash |
 
 ## Hook Events
 
-| Event | When Fired |
-|-------|------------|
-| PreToolUse | Before a tool executes |
-| PostToolUse | After a tool completes |
-| SessionStart | When Claude Code starts |
-| SessionEnd | When session ends |
-| Stop | When Claude stops responding |
+| Event        | When Fired                   |
+| ------------ | ---------------------------- |
+| PreToolUse   | Before a tool executes       |
+| PostToolUse  | After a tool completes       |
+| SessionStart | When Claude Code starts      |
+| SessionEnd   | When session ends            |
+| Stop         | When Claude stops responding |
 
 ## Quick Commands
 

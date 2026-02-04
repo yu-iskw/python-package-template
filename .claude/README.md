@@ -4,7 +4,7 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 
 ## Structure
 
-```
+```text
 .claude/
 ├── README.md              # This file
 ├── settings.json          # Hooks, permissions, and environment
@@ -40,7 +40,7 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 
 Invoke skills with slash commands:
 
-```
+```bash
 /setup-dev-env          # Set up your development environment
 /lint-and-fix           # Fix all linting issues
 /test-and-fix           # Fix failing tests
@@ -53,24 +53,25 @@ Invoke skills with slash commands:
 
 Agents are specialized assistants invoked via the Task tool:
 
-| Agent | Purpose |
-|-------|---------|
-| **verifier** | Runs build → lint → test cycle |
-| **code-reviewer** | Reviews code for quality and security |
-| **parallel-executor** | Orchestrates parallel task execution |
+| Agent                      | Purpose                                     |
+| -------------------------- | ------------------------------------------- |
+| **verifier**               | Runs build → lint → test cycle              |
+| **code-reviewer**          | Reviews code for quality and security       |
+| **parallel-executor**      | Orchestrates parallel task execution        |
 | **parallel-tasks-planner** | Creates execution plans with file ownership |
-| **task-worker** | Executes isolated subtasks with constraints |
+| **task-worker**            | Executes isolated subtasks with constraints |
 
 ### Parallel Execution
 
 For large tasks that can benefit from concurrent work:
 
-```
+```bash
 /parallel-executor Add comprehensive logging to all modules
 ```
 
 **Architecture:**
-```
+
+```text
 /parallel-executor "task description"
         │
         ▼
@@ -110,6 +111,7 @@ For large tasks that can benefit from concurrent work:
 ### Self-Improvement
 
 This configuration supports self-evolution. Use `/improve-claude-config` when:
+
 - Claude makes repeated mistakes
 - You want to automate a recurring workflow
 - New conventions should be documented
@@ -119,6 +121,7 @@ This configuration supports self-evolution. Use `/improve-claude-config` when:
 ### settings.json
 
 Contains:
+
 - **permissions**: Allowed and denied commands
 - **hooks**: Automatic triggers for tool events
 - **env**: Environment variables
@@ -126,6 +129,7 @@ Contains:
 ### CLAUDE.md (in project root)
 
 Project memory loaded at session start. Contains:
+
 - Quick commands reference
 - Code style conventions
 - Testing workflow

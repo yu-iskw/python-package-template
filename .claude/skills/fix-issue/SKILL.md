@@ -22,6 +22,7 @@ gh issue view $ARGUMENTS
 ```
 
 Analyze:
+
 - What is the reported problem?
 - What is the expected behavior?
 - What is the actual behavior?
@@ -40,6 +41,7 @@ find . -name "*.py" | xargs grep -l "related_term"
 ```
 
 Understand:
+
 - Which files are involved?
 - What is the current implementation?
 - Where does the bug originate?
@@ -53,6 +55,7 @@ git checkout -b fix/issue-$ARGUMENTS-<brief-description>
 ### 4. Implement the Fix
 
 Apply the **minimum necessary change** to resolve the issue:
+
 - Fix the root cause, not symptoms
 - Don't refactor unrelated code
 - Keep changes focused and reviewable
@@ -60,6 +63,7 @@ Apply the **minimum necessary change** to resolve the issue:
 ### 5. Add/Update Tests
 
 Create tests that:
+
 - Reproduce the original bug (should fail without fix)
 - Verify the fix works (should pass with fix)
 - Cover edge cases
@@ -116,6 +120,7 @@ EOF
 **Input**: `/fix-issue 42`
 
 **Workflow**:
+
 1. `gh issue view 42` - User reports "import fails with ModuleNotFoundError"
 2. Search for import handling code
 3. `git checkout -b fix/issue-42-import-error`
@@ -127,10 +132,10 @@ EOF
 
 ## Quick Reference
 
-| Task | Command |
-|------|---------|
-| View issue | `gh issue view <number>` |
-| List issues | `gh issue list` |
-| Create branch | `git checkout -b fix/issue-<n>-<desc>` |
-| Link PR to issue | Include `Fixes #<n>` in commit message |
-| Close issue via PR | Include `Closes #<n>` in PR body |
+| Task               | Command                                |
+| ------------------ | -------------------------------------- |
+| View issue         | `gh issue view <number>`               |
+| List issues        | `gh issue list`                        |
+| Create branch      | `git checkout -b fix/issue-<n>-<desc>` |
+| Link PR to issue   | Include `Fixes #<n>` in commit message |
+| Close issue via PR | Include `Closes #<n>` in PR body       |

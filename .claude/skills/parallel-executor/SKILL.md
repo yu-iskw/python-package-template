@@ -29,7 +29,7 @@ When invoked with `/parallel-executor <task description>`, this skill:
 
 Use the Task tool to invoke the parallel-executor agent:
 
-```
+```text
 Task tool call:
   description: "Execute parallel tasks"
   subagent_type: "parallel-executor"
@@ -48,7 +48,7 @@ Task tool call:
 
 ## Architecture
 
-```
+```text
 /parallel-executor "Add logging to all modules"
               │
               ▼
@@ -88,29 +88,33 @@ Task tool call:
 ## When to Use
 
 Use this skill for tasks that:
+
 - Span multiple independent modules or files
 - Can be logically decomposed into parallel work
 - Would benefit from concurrent execution
 - Are large enough to justify the planning overhead
 
 **Good candidates:**
+
 - "Add logging to API, database, and utility modules"
 - "Implement CRUD endpoints for users, products, and orders"
 - "Add type hints to all modules"
 - "Write tests for all service classes"
 
 **Not ideal for:**
+
 - Small, focused changes to a single file
 - Tasks with heavy interdependencies
 - Quick fixes or simple refactoring
 
 ## Example
 
-```
+```bash
 /parallel-executor Add comprehensive error handling to all API endpoints
 ```
 
 This will:
+
 1. **Plan**: Decompose into tasks per endpoint/module
 2. **Execute Phase 1**: Add error handling utilities (parallel if independent)
 3. **Execute Phase 2**: Update endpoints (parallel per endpoint)

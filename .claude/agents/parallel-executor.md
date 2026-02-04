@@ -28,13 +28,14 @@ You receive a complex task description that benefits from parallel execution.
 
 Invoke the `parallel-tasks-planner` agent to create an execution plan:
 
-```
+```text
 Use Task tool:
   - subagent_type: "parallel-tasks-planner"
   - prompt: "Decompose this task: {task description}"
 ```
 
 The planner returns a YAML execution plan with:
+
 - Phases (parallel vs sequential)
 - Tasks with file ownership
 - Dependencies between phases
@@ -67,7 +68,7 @@ Execute each phase in order:
 
 **CRITICAL**: Launch ALL tasks in a parallel phase in a SINGLE message with multiple Task tool calls.
 
-```
+```text
 In ONE assistant response, include multiple Task calls:
 
 Task call 1:
@@ -112,6 +113,7 @@ tail -20 {output_file_path}
 #### Wait for Phase Completion
 
 Before starting the next phase:
+
 1. All background tasks from current phase must complete
 2. Check each task's output for success/failure
 3. Handle any failures before proceeding
@@ -120,7 +122,7 @@ Before starting the next phase:
 
 Execute tasks one at a time, waiting for each to complete:
 
-```
+```text
 Task call (foreground):
   description: "Task 2: Integration"
   prompt: {detailed instructions}
@@ -132,13 +134,14 @@ Task call (foreground):
 
 After all phases complete, run verification:
 
-```
+```text
 Use Task tool:
   - subagent_type: "verifier"
   - prompt: "Verify the project after parallel task execution"
 ```
 
 Or run directly:
+
 ```bash
 make lint && make test
 ```
@@ -151,33 +154,39 @@ Output a structured summary:
 ## Parallel Execution Summary
 
 ### Task
+
 {original task description}
 
 ### Execution Plan
+
 - Total phases: {N}
 - Total subtasks: {M}
 - Max parallel tasks: {P}
 
 ### Phase Results
-| Phase | Type | Tasks | Status |
-|-------|------|-------|--------|
-| 1 | Parallel | 3 | Completed |
-| 2 | Sequential | 1 | Completed |
-| 3 | Parallel | 2 | Completed |
+
+| Phase | Type       | Tasks | Status    |
+| ----- | ---------- | ----- | --------- |
+| 1     | Parallel   | 3     | Completed |
+| 2     | Sequential | 1     | Completed |
+| 3     | Parallel   | 2     | Completed |
 
 ### Task Results
-| Task ID | Status | Files Modified |
-|---------|--------|----------------|
-| task-1a | Success | src/api.py |
-| task-1b | Success | src/db.py |
-| task-2 | Success | src/main.py |
+
+| Task ID | Status  | Files Modified |
+| ------- | ------- | -------------- |
+| task-1a | Success | src/api.py     |
+| task-1b | Success | src/db.py      |
+| task-2  | Success | src/main.py    |
 
 ### Verification
+
 - Build: PASS
 - Lint: PASS
 - Tests: PASS
 
 ### Files Modified
+
 - src/api.py
 - src/db.py
 - src/main.py
@@ -187,18 +196,21 @@ Output a structured summary:
 ## Error Handling
 
 ### File Conflict Detected
+
 1. Stop execution
 2. Report the conflict
 3. Re-invoke planner with constraint to separate conflicting files
 4. Resume with new plan
 
 ### Task Failure
+
 1. Read the failed task's output
 2. Determine if retryable
 3. If retryable: re-run the specific task
 4. If not: report failure and stop
 
 ### Verification Failure
+
 1. Identify which check failed
 2. Invoke appropriate fix skill (lint-and-fix, test-and-fix)
 3. Re-run verification
