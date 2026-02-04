@@ -1,0 +1,111 @@
+# Claude Code Configuration
+
+This directory contains the Claude Code configuration for AI-assisted development.
+
+## Structure
+
+```
+.claude/
+├── README.md              # This file
+├── settings.json          # Hooks, permissions, and environment
+├── agents/                # Specialized subagents
+│   ├── verifier.md       # Comprehensive project verification
+│   └── code-reviewer.md  # Code quality and security review
+├── skills/               # Reusable workflows and knowledge
+│   ├── build-and-fix/    # Auto-fix build errors
+│   ├── clean-project/    # Hard reset environment
+│   ├── common-references/ # Shared documentation
+│   ├── fix-issue/        # GitHub issue workflow
+│   ├── improve-claude-config/ # Self-improvement skill
+│   ├── initialize-project/ # Template bootstrapping
+│   ├── lint-and-fix/     # Auto-fix linting issues
+│   ├── pr-workflow/      # Pull request workflow
+│   ├── python-upgrade/   # Dependency upgrades
+│   ├── security-vulnerability-audit/ # Security scanning
+│   ├── setup-dev-env/    # Environment setup
+│   └── test-and-fix/     # Auto-fix failing tests
+└── hooks/                # Hook scripts
+    ├── block-dangerous.sh # Block dangerous commands
+    ├── format-python.sh   # Auto-format Python files
+    └── validate-commit.sh # Validate commit messages
+```
+
+## Quick Start
+
+### Using Skills
+
+Invoke skills with slash commands:
+
+```
+/setup-dev-env          # Set up your development environment
+/lint-and-fix           # Fix all linting issues
+/test-and-fix           # Fix failing tests
+/pr-workflow            # Create a pull request
+/fix-issue 123          # Fix GitHub issue #123
+```
+
+### Using Agents
+
+Agents are specialized assistants invoked automatically or via Task tool:
+
+- **verifier**: Runs complete build → lint → test cycle
+- **code-reviewer**: Reviews code for quality and security issues
+
+### Self-Improvement
+
+This configuration supports self-evolution. Use `/improve-claude-config` when:
+- Claude makes repeated mistakes
+- You want to automate a recurring workflow
+- New conventions should be documented
+
+## Configuration Files
+
+### settings.json
+
+Contains:
+- **permissions**: Allowed and denied commands
+- **hooks**: Automatic triggers for tool events
+- **env**: Environment variables
+
+### CLAUDE.md (in project root)
+
+Project memory loaded at session start. Contains:
+- Quick commands reference
+- Code style conventions
+- Testing workflow
+- Common gotchas
+
+## Best Practices
+
+1. **Keep CLAUDE.md concise**: Under 150 lines, move details to skills
+2. **Use specific skills**: Don't duplicate knowledge across skills
+3. **Test hooks**: Validate hook scripts work before committing
+4. **Version control**: Commit configuration changes with clear messages
+5. **Self-improve**: Add rules when Claude makes repeated mistakes
+
+## Customization
+
+### Adding a New Skill
+
+1. Create directory: `.claude/skills/<skill-name>/`
+2. Create `SKILL.md` with YAML frontmatter and markdown content
+3. Reference from other skills or invoke with `/<skill-name>`
+
+### Adding a New Hook
+
+1. Create script in `.claude/hooks/`
+2. Make executable: `chmod +x .claude/hooks/<script>.sh`
+3. Register in `.claude/settings.json` under appropriate event
+
+### Adding a New Agent
+
+1. Create `.claude/agents/<agent-name>.md`
+2. Define name, description, tools, and model in frontmatter
+3. Write agent instructions in markdown body
+
+## Resources
+
+- [Claude Code Documentation](https://code.claude.com/docs)
+- [Skills Guide](./skills/common-references/claude-code-guide.md)
+- [Python Commands](./skills/common-references/python-commands.md)
+- [Trunk Commands](./skills/common-references/trunk-commands.md)
