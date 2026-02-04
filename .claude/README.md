@@ -10,7 +10,9 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 ├── settings.json          # Hooks, permissions, and environment
 ├── agents/                # Specialized subagents
 │   ├── verifier.md       # Comprehensive project verification
-│   └── code-reviewer.md  # Code quality and security review
+│   ├── code-reviewer.md  # Code quality and security review
+│   ├── parallel-tasks-planner.md  # Plan parallel task decomposition
+│   └── task-worker.md    # Worker agent for isolated subtasks
 ├── skills/               # Reusable workflows and knowledge
 │   ├── build-and-fix/    # Auto-fix build errors
 │   ├── clean-project/    # Hard reset environment
@@ -19,6 +21,7 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 │   ├── improve-claude-config/ # Self-improvement skill
 │   ├── initialize-project/ # Template bootstrapping
 │   ├── lint-and-fix/     # Auto-fix linting issues
+│   ├── parallel-executor/ # Execute tasks with parallel subagents
 │   ├── pr-workflow/      # Pull request workflow
 │   ├── python-upgrade/   # Dependency upgrades
 │   ├── security-vulnerability-audit/ # Security scanning
@@ -50,6 +53,22 @@ Agents are specialized assistants invoked automatically or via Task tool:
 
 - **verifier**: Runs complete build → lint → test cycle
 - **code-reviewer**: Reviews code for quality and security issues
+- **parallel-tasks-planner**: Decomposes complex tasks for parallel execution
+- **task-worker**: Executes isolated subtasks with file ownership constraints
+
+### Parallel Execution
+
+For large tasks that can benefit from concurrent work:
+
+```
+/parallel-executor Add comprehensive logging to all modules
+```
+
+This will:
+1. Plan task decomposition with file ownership
+2. Execute independent subtasks in parallel
+3. Coordinate sequential phases
+4. Verify results
 
 ### Self-Improvement
 
@@ -107,5 +126,6 @@ Project memory loaded at session start. Contains:
 
 - [Claude Code Documentation](https://code.claude.com/docs)
 - [Skills Guide](./skills/common-references/claude-code-guide.md)
+- [Parallel Execution Patterns](./skills/common-references/parallel-execution-patterns.md)
 - [Python Commands](./skills/common-references/python-commands.md)
 - [Trunk Commands](./skills/common-references/trunk-commands.md)
