@@ -9,10 +9,11 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 ├── README.md              # This file
 ├── settings.json          # Hooks, permissions, and environment
 ├── agents/                # Specialized subagents
-│   ├── verifier.md       # Comprehensive project verification
+│   ├── verifier.md       # Build/lint/test verification
 │   ├── code-reviewer.md  # Code quality and security review
-│   ├── parallel-tasks-planner.md  # Plan parallel task decomposition
-│   └── task-worker.md    # Worker agent for isolated subtasks
+│   ├── parallel-executor.md      # Orchestrates parallel task execution
+│   ├── parallel-tasks-planner.md # Plans task decomposition
+│   └── task-worker.md    # Executes isolated subtasks
 ├── skills/               # Reusable workflows and knowledge
 │   ├── build-and-fix/    # Auto-fix build errors
 │   ├── clean-project/    # Hard reset environment
@@ -21,7 +22,7 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 │   ├── improve-claude-config/ # Self-improvement skill
 │   ├── initialize-project/ # Template bootstrapping
 │   ├── lint-and-fix/     # Auto-fix linting issues
-│   ├── parallel-executor/ # Execute tasks with parallel subagents
+│   ├── parallel-executor/ # Invoke parallel execution workflow
 │   ├── pr-workflow/      # Pull request workflow
 │   ├── python-upgrade/   # Dependency upgrades
 │   ├── security-vulnerability-audit/ # Security scanning
@@ -45,16 +46,20 @@ Invoke skills with slash commands:
 /test-and-fix           # Fix failing tests
 /pr-workflow            # Create a pull request
 /fix-issue 123          # Fix GitHub issue #123
+/parallel-executor <task> # Execute complex tasks in parallel
 ```
 
 ### Using Agents
 
-Agents are specialized assistants invoked automatically or via Task tool:
+Agents are specialized assistants invoked via the Task tool:
 
-- **verifier**: Runs complete build → lint → test cycle
-- **code-reviewer**: Reviews code for quality and security issues
-- **parallel-tasks-planner**: Decomposes complex tasks for parallel execution
-- **task-worker**: Executes isolated subtasks with file ownership constraints
+| Agent | Purpose |
+|-------|---------|
+| **verifier** | Runs build → lint → test cycle |
+| **code-reviewer** | Reviews code for quality and security |
+| **parallel-executor** | Orchestrates parallel task execution |
+| **parallel-tasks-planner** | Creates execution plans with file ownership |
+| **task-worker** | Executes isolated subtasks with constraints |
 
 ### Parallel Execution
 
@@ -64,11 +69,43 @@ For large tasks that can benefit from concurrent work:
 /parallel-executor Add comprehensive logging to all modules
 ```
 
-This will:
-1. Plan task decomposition with file ownership
-2. Execute independent subtasks in parallel
-3. Coordinate sequential phases
-4. Verify results
+**Architecture:**
+```
+/parallel-executor "task description"
+        │
+        ▼
+┌───────────────────────┐
+│  parallel-executor    │  ← Orchestrator agent
+│       agent           │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ parallel-tasks-planner│  ← Creates execution plan
+│       agent           │
+└───────────┬───────────┘
+            │
+            ▼ (YAML plan with phases & file ownership)
+            │
+┌───────────┴───────────┐
+│   Phase Execution     │
+│                       │
+│  Phase 1 (Parallel):  │
+│  ┌─────┐  ┌─────┐    │
+│  │ W1  │  │ W2  │    │  ← task-worker agents
+│  └─────┘  └─────┘    │
+│                       │
+│  Phase 2 (Sequential):│
+│  ┌──────────────┐    │
+│  │     W3       │    │
+│  └──────────────┘    │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│   verifier agent      │  ← Verification
+└───────────────────────┘
+```
 
 ### Self-Improvement
 
@@ -96,7 +133,7 @@ Project memory loaded at session start. Contains:
 
 ## Best Practices
 
-1. **Keep CLAUDE.md concise**: Under 150 lines, move details to skills
+1. **Keep CLAUDE.md concise**: Under 100 lines, move details to skills
 2. **Use specific skills**: Don't duplicate knowledge across skills
 3. **Test hooks**: Validate hook scripts work before committing
 4. **Version control**: Commit configuration changes with clear messages
@@ -108,7 +145,7 @@ Project memory loaded at session start. Contains:
 
 1. Create directory: `.claude/skills/<skill-name>/`
 2. Create `SKILL.md` with YAML frontmatter and markdown content
-3. Reference from other skills or invoke with `/<skill-name>`
+3. Invoke with `/<skill-name>`
 
 ### Adding a New Hook
 

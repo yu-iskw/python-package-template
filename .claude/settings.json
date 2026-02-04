@@ -21,7 +21,8 @@
       "Write",
       "Edit",
       "Glob",
-      "Grep"
+      "Grep",
+      "Task"
     ],
     "deny": [
       "Bash(rm -rf /)",

@@ -56,6 +56,26 @@ make clean      # Clean build artifacts
 - The `uv.lock` file is committed for reproducibility - don't gitignore it
 - Run `trunk install` if linters report missing tools
 
+## Parallel Task Execution
+
+For large tasks that can benefit from concurrent work:
+
+```
+/parallel-executor Add comprehensive logging to all modules
+```
+
+This decomposes tasks into independent subtasks with file ownership, executes them in parallel, and verifies results.
+
+## Available Agents
+
+| Agent | Purpose |
+|-------|---------|
+| `verifier` | Run build → lint → test cycle |
+| `code-reviewer` | Review code for quality and security |
+| `parallel-executor` | Orchestrate parallel task execution |
+| `parallel-tasks-planner` | Plan task decomposition |
+| `task-worker` | Execute isolated subtasks |
+
 ## Self-Improvement
 
 This project supports Claude Code self-improvement. When you notice:
