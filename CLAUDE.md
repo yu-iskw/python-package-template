@@ -3,6 +3,7 @@
 ## Project Overview
 
 This is a production-ready Python package template using modern tooling:
+
 - **Package Manager**: uv (fast Python package manager)
 - **Build System**: Hatchling
 - **Linting/Formatting**: Trunk (manages Ruff, Mypy, Black, isort, Pylint, Bandit)
@@ -41,6 +42,7 @@ make clean      # Clean build artifacts
 - Run `make lint && make test` before commits
 - Commit messages: `type(scope): description` (e.g., `feat(api): add user endpoint`)
 - Types: feat, fix, docs, style, refactor, test, chore
+- Record changes for release using the `manage-changelog` skill when `changie` is available (add fragments, batch releases, merge into CHANGELOG.md)
 
 ## Architecture
 
@@ -48,6 +50,7 @@ make clean      # Clean build artifacts
 - Development scripts in `dev/`
 - CI/CD workflows in `.github/workflows/`
 - Claude Code configuration in `.claude/`
+- Document significant design decisions as Architecture Decision Records (ADRs) in `docs/adr`; use the `manage-adr` skill when `adr` is available
 
 ## Common Gotchas
 
@@ -60,7 +63,7 @@ make clean      # Clean build artifacts
 
 For large tasks that can benefit from concurrent work:
 
-```
+```bash
 /parallel-executor Add comprehensive logging to all modules
 ```
 
@@ -68,17 +71,27 @@ This decomposes tasks into independent subtasks with file ownership, executes th
 
 ## Available Agents
 
-| Agent | Purpose |
-|-------|---------|
-| `verifier` | Run build → lint → test cycle |
-| `code-reviewer` | Review code for quality and security |
-| `parallel-executor` | Orchestrate parallel task execution |
-| `parallel-tasks-planner` | Plan task decomposition |
-| `task-worker` | Execute isolated subtasks |
+| Agent                    | Purpose                              |
+| ------------------------ | ------------------------------------ |
+| `verifier`               | Run build → lint → test cycle        |
+| `code-reviewer`          | Review code for quality and security |
+| `parallel-executor`      | Orchestrate parallel task execution  |
+| `parallel-tasks-planner` | Plan task decomposition              |
+| `task-worker`            | Execute isolated subtasks            |
+
+## Available Skills
+
+Use these when the corresponding CLI is available (`adr`, `changie`):
+
+| Skill              | Purpose                                                                                       |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| `manage-adr`       | Manage Architecture Decision Records (init, create, list, link ADRs in `docs/adr`)            |
+| `manage-changelog` | Manage changelogs with Changie (init, add fragments, batch releases, merge into CHANGELOG.md) |
 
 ## Self-Improvement
 
 This project supports Claude Code self-improvement. When you notice:
+
 - Repeated mistakes Claude makes, add rules to this file
 - New workflows you explain often, create skills in `.claude/skills/`
 - Patterns that should be automated, add hooks in `.claude/settings.json`
