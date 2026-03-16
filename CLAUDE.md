@@ -6,7 +6,7 @@ This is a production-ready Python package template using modern tooling:
 
 - **Package Manager**: uv (fast Python package manager)
 - **Build System**: Hatchling
-- **Linting/Formatting**: Trunk (manages Ruff, Mypy, Black, isort, Pylint, Bandit)
+- **Linting/Formatting**: Trunk (manages Ruff, Mypy, Black, Pylint, Bandit)
 - **Testing**: pytest
 - **Python**: 3.10+ (see `.python-version` for current version)
 
@@ -17,6 +17,7 @@ make setup      # Install dependencies and set up environment
 make lint       # Run all linters via Trunk
 make format     # Auto-format code via Trunk
 make test       # Run pytest test suite
+make codeql     # Run local CodeQL analysis
 make build      # Build the package
 make clean      # Clean build artifacts
 ```
@@ -25,7 +26,7 @@ make clean      # Clean build artifacts
 
 - Follow Google Python Style Guide (configured in `.pylintrc`)
 - Use type hints for all public functions
-- Imports sorted by isort (stdlib, third-party, local)
+- Imports sorted by Ruff (rule `I`)
 - Max line length: 100 characters (Ruff/Black configured)
 - Use `snake_case` for functions/variables, `PascalCase` for classes
 
@@ -35,6 +36,21 @@ make clean      # Clean build artifacts
 - Test files must match pattern `test_*.py`
 - Run `make test` before committing
 - Aim for meaningful test coverage on critical paths
+
+## Security
+
+- **Static Analysis**: Trunk manages Bandit, Semgrep, and Trivy for fast feedback.
+- **Deep Analysis**: GitHub CodeQL performs path-based data flow analysis (configured in `.github/workflows/codeql.yml`).
+- **Dependency Scanning**: OSV-Scanner and Trivy scan for vulnerable dependencies.
+- Use `trunk check` locally to catch common issues before pushing.
+
+## AI Guardrails & Code Quality
+
+To prevent the implementation of "messy code" by AI agents:
+
+- **Cyclomatic Complexity**: Max complexity per function is **10** (enforced via Ruff `C901`).
+- **Maintainability**: CodeQL `security-and-quality` suite tracks long-term code health.
+- **Refactoring Requirement**: If an AI agent introduces complexity exceeding 10, it MUST refactor the code into smaller, more manageable functions before completion.
 
 ## Git Workflow
 
