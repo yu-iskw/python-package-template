@@ -46,6 +46,11 @@ format:
 test:
 	bash ./dev/test_python.sh
 
+# Run local CodeQL analysis.
+.PHONY: codeql
+codeql:
+	bash ./dev/codeql.sh
+
 # Build the package
 .PHONY: build
 build:

@@ -173,3 +173,8 @@ cython_debug/
 # Claude Code local configurations (personal overrides)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# CodeQL
+.codeql_db/
+codeql-results.sarif
+codeql-summary.txt

@@ -17,6 +17,7 @@ make setup      # Install dependencies and set up environment
 make lint       # Run all linters via Trunk
 make format     # Auto-format code via Trunk
 make test       # Run pytest test suite
+make codeql     # Run local CodeQL analysis
 make build      # Build the package
 make clean      # Clean build artifacts
 ```
