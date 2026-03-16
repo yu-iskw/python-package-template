@@ -40,4 +40,4 @@ An autonomous loop for the agent to identify, analyze, and fix failing unit test
 
 - [Python Development Commands](../common-references/python-commands.md): Common commands for testing and managing dependencies.
 - [Pytest Documentation](https://docs.pytest.org/): Official documentation for the pytest framework.
-- [Unit Test Manners](../../../.cursor/rules/tech-stack.mdc): Project-specific testing guidelines.
+- Unit Test Manners: Project-specific testing guidelines.

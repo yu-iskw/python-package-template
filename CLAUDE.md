@@ -36,6 +36,21 @@ make clean      # Clean build artifacts
 - Run `make test` before committing
 - Aim for meaningful test coverage on critical paths
 
+## Security
+
+- **Static Analysis**: Trunk manages Bandit, Semgrep, and Trivy for fast feedback.
+- **Deep Analysis**: GitHub CodeQL performs path-based data flow analysis (configured in `.github/workflows/codeql.yml`).
+- **Dependency Scanning**: OSV-Scanner and Trivy scan for vulnerable dependencies.
+- Use `trunk check` locally to catch common issues before pushing.
+
+## AI Guardrails & Code Quality
+
+To prevent the implementation of "messy code" by AI agents:
+
+- **Cyclomatic Complexity**: Max complexity per function is **10** (enforced via Ruff `C901`).
+- **Maintainability**: CodeQL `security-and-quality` suite tracks long-term code health.
+- **Refactoring Requirement**: If an AI agent introduces complexity exceeding 10, it MUST refactor the code into smaller, more manageable functions before completion.
+
 ## Git Workflow
 
 - Create feature branches from `main`

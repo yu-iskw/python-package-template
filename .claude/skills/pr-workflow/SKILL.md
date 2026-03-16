@@ -26,7 +26,6 @@ A complete workflow for creating, developing, and submitting pull requests follo
    ```
 
    Branch naming convention:
-
    - `feat/<description>` - New features
    - `fix/<description>` - Bug fixes
    - `docs/<description>` - Documentation
@@ -76,7 +75,6 @@ Before creating PR, run full verification:
    ```
 
    Conventional commit types:
-
    - `feat`: New feature
    - `fix`: Bug fix
    - `docs`: Documentation
