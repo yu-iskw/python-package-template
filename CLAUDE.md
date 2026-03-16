@@ -6,7 +6,7 @@ This is a production-ready Python package template using modern tooling:
 
 - **Package Manager**: uv (fast Python package manager)
 - **Build System**: Hatchling
-- **Linting/Formatting**: Trunk (manages Ruff, Mypy, Black, isort, Pylint, Bandit)
+- **Linting/Formatting**: Trunk (manages Ruff, Mypy, Black, Pylint, Bandit)
 - **Testing**: pytest
 - **Python**: 3.10+ (see `.python-version` for current version)
 
@@ -26,7 +26,7 @@ make clean      # Clean build artifacts
 
 - Follow Google Python Style Guide (configured in `.pylintrc`)
 - Use type hints for all public functions
-- Imports sorted by isort (stdlib, third-party, local)
+- Imports sorted by Ruff (rule `I`)
 - Max line length: 100 characters (Ruff/Black configured)
 - Use `snake_case` for functions/variables, `PascalCase` for classes
 

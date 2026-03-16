@@ -46,14 +46,14 @@ classifiers = [
 description = "A dbt artifacts parser in python"
 dependencies = []
 
-[project.optional-dependencies]
+[project.scripts]
+
+[dependency-groups]
 dev = [
+  "xenon>=0.9.3",
   "pytest>=8.3.5",
   "bandit>=1.8.3",
-  "isort>=6.0.1",
   "ruff>=0.9.10",
   "mypy>=1.15.0",
   "pylint>=3.3.5",
 ]
-
-[project.scripts]
