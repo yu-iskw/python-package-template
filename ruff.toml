@@ -1,8 +1,75 @@
-# Generic, formatter-friendly config.
-select = ["B", "C90", "C901", "D3", "E", "F", "I", "SIM", "UP"]
+# Progressive Ruff configuration for AI-assisted coding harness.
+# Catches bugs, AI-generated anti-patterns, and maintains consistency.
 
-# Never enforce `E501` (line length violations). This should be handled by formatters.
-ignore = ["E501"]
+target-version = "py311"
+line-length = 120
 
-[mccabe]
-max-complexity = 10
+[lint]
+# Rule sets (grouped by purpose):
+#   Core:  F (Pyflakes), E/W (pycodestyle), I (isort), B (flake8-bugbear)
+#   Modern: UP (pyupgrade), SIM (flake8-simplify), RUF (Ruff-specific)
+#   Complexity: C901 (McCabe); see CLAUDE.md "Complexity gates"
+#   AI safety net (Phase 1):
+#     TRY (tryceratops), BLE (blind-except), RET (return hygiene),
+#     PERF (perflint), PIE (misc), FURB (refurb/modernization),
+#     C4 (comprehensions), ISC (implicit string concat), ERA (dead code),
+#     LOG (logging format), A (builtin shadowing)
+#   Robustness (Phase 2):
+#     DTZ (timezone-aware datetime), PTH (pathlib over os.path),
+#     N (PEP 8 naming), PLC0415 (imports at top-level)
+#   Type safety (Phase 3):
+#     ANN (annotations), ARG (unused args), PL (pylint subset)
+select = [
+  "F",
+  "E",
+  "W",
+  "I",
+  "B",
+  "UP",
+  "SIM",
+  "RUF",
+  "C901",
+  "TRY",
+  "BLE",
+  "RET",
+  "PERF",
+  "PIE",
+  "FURB",
+  "C4",
+  "ISC",
+  "ERA",
+  "LOG",
+  "A",
+  "DTZ",
+  "PTH",
+  "N",
+  "PLC0415",
+  "ANN",
+  "ARG",
+  "PL",
+]
+
+ignore = [
+  "E501",   # line length handled by formatter
+  "TRY003", # long exception messages OK in CLI tools
+  "ANN401", # Any type allowed
+]
+
+[lint.per-file-ignores]
+
+
+[lint.pylint]
+max-args = 10
+
+[lint.mccabe]
+max-complexity = 15
+
+[lint.isort]
+# Sort imports into sections.
+combine-as-imports = true
+
+[format]
+# Keep formatting consistent with defaults.
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
