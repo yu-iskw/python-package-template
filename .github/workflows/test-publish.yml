@@ -64,4 +64,4 @@ jobs:
           sleep 30
       - name: Test package
         run: |
-          python -c 'python -m ${PYTHON_NAME_SPACE}'
+          python -c "import ${PYTHON_NAME_SPACE}"

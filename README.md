@@ -6,7 +6,7 @@ A production-ready Python package using modern tooling.
 
 - **Package Management**: [uv](https://github.com/astral-sh/uv)
 - **Build System**: [Hatchling](https://hatch.pypa.io/latest/)
-- **Linting & Formatting**: [Trunk](https://trunk.io/) (Ruff, Mypy, Black, isort, Pylint)
+- **Linting & Formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit; Ruff is also the formatter)
 - **Testing**: [pytest](https://docs.pytest.org/)
 - **CI/CD**: GitHub Actions
 
@@ -19,6 +19,8 @@ This template enforces high security and maintainability standards:
 - **Trunk Linters**: [Bandit](https://github.com/PyCQA/bandit) (security), [Semgrep](https://semgrep.dev/) (patterns), [Trivy](https://github.com/aquasecurity/trivy) (IaC/Secret scanning), and [OSV-Scanner](https://github.com/google/osv-scanner) (dependencies).
 
 ## Development
+
+Conventions, build commands, and AI-agent instructions: see [AGENTS.md](AGENTS.md). Claude Code–specific config lives in `CLAUDE.md` (it imports [AGENTS.md](AGENTS.md)) and in [`.claude/`](.claude/).
 
 ```bash
 make setup      # Install dependencies and set up environment

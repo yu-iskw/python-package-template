@@ -20,4 +20,9 @@ SCRIPT_FILE="$(readlink -f "$0")"
 SCRIPT_DIR="$(dirname "${SCRIPT_FILE}")"
 MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
 
-pytest -v -s --cache-clear "${MODULE_DIR}/tests"
+tests_list_file="$(mktemp)"
+find "${MODULE_DIR}/src" -name "tests" -type d -print0 >"${tests_list_file}" || exit 1
+while IFS= read -r -d "" tests_dir; do
+	pytest -v -s --cache-clear "${tests_dir}"
+done <"${tests_list_file}"
+rm -f "${tests_list_file}"

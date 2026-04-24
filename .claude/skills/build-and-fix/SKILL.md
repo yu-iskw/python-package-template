@@ -1,6 +1,6 @@
 ---
 name: build-and-fix
-description: Build the project and automatically fix any build errors, compilation failures, or type mismatches. Use when the project fails to build, shows "broken" states, or after making significant changes.
+description: Build the project and automatically fix packaging or build errors (for example Hatch failures) and related breakage. Use when the project fails to build, shows "broken" states, or after making significant changes.
 ---
 
 # Build and Fix Loop
@@ -15,7 +15,7 @@ An autonomous loop for the agent to identify, analyze, and fix build errors usin
 2. **Analyze**: Examine the build output to determine:
    - The failing component (e.g., `hatch` build error).
    - The specific error message (e.g., missing dependencies, syntax errors, packaging issues).
-   - Refer to [../common-references/python-commands.md](../common-references/python-commands.md) for build commands.
+   - For `make` / `uv` commands, see the project root [CLAUDE.md](../../../CLAUDE.md).
 3. **Fix**: Apply the minimum necessary change to resolve the error (e.g., updating `pyproject.toml`, fixing syntax, or adding missing files).
 4. **Verify**: Re-run `make build`.
    - If passed: Finish.
@@ -37,5 +37,4 @@ An autonomous loop for the agent to identify, analyze, and fix build errors usin
 
 ## Resources
 
-- [Python Development Commands](../common-references/python-commands.md): Common commands for building and managing dependencies.
 - [Hatch Documentation](https://hatch.pypa.io/): Official documentation for the Hatch build backend.

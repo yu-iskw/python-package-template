@@ -16,9 +16,18 @@ An autonomous loop for the agent to identify, fix, and verify linting and format
 3. **Fix**:
    - For formatting issues, run `make format` (which executes `trunk fmt -a`).
    - For linting violations, apply the minimum necessary change to the source code to resolve the error.
-4. **Verify**: Re-run `make lint`.
+   - Resolve findings by changing code, types, imports, or structure—not with suppressions (see **Constraints**).
+4. **Verify**: Re-run `make lint` (Ruff, **Pyright**, Pylint, and security tools via Trunk).
+   - For type-only triage, `uv run pyright` also reads `pyproject.toml` `[tool.pyright]`; prefer Trunk for CI parity.
    - If passed: Move to the next issue or finish if all are resolved.
    - If failed: Analyze the new failure and repeat the loop.
+
+## Constraints
+
+- Do not silence Trunk/Ruff/Pyright/Pylint/Bandit/Semgrep findings with inline suppressions (for example `# noqa`, `# type: ignore`, `# pylint: disable`, `ruff: noqa`, file-level `# ruff: noqa`, or Trunk inline disable comments).
+- Do not broaden project configuration to hide violations (for example new `[tool.ruff.lint]` ignores, Pyright `report*` toggles, or Pylint disables) unless the user explicitly asked for that policy change.
+- Prefer `make format` for auto-fixable style; otherwise fix the underlying issue the linter reports.
+- If fixes fail after genuine attempts, stop and surface the finding for a human to decide—do not add suppressions to make CI green.
 
 ## Termination Criteria
 
@@ -35,5 +44,4 @@ An autonomous loop for the agent to identify, fix, and verify linting and format
 
 ## Resources
 
-- [Python Development Commands](../common-references/python-commands.md): Common commands for linting and formatting.
 - [Trunk Documentation](https://docs.trunk.io/): Official documentation for the Trunk CLI.

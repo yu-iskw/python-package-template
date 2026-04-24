@@ -5,8 +5,7 @@ on:
     paths:
       - .github/workflows/test.yml
       - pyproject.toml
-      - dbt_artifacts_parser/**/*.py
-      - tests/**/*.py
+      - src/your_package/**/*.py
       - pylintrc
   push:
     branches:
