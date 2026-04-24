@@ -21,20 +21,16 @@ setup: setup-python
 setup-python:
 	bash ./dev/setup.sh --deps "development"
 
+# Upgrade Python dependencies (refresh uv.lock, then sync like development setup).
+.PHONY: upgrade-deps
+upgrade-deps:
+	uv lock --upgrade
+	uv sync --all-extras
+
 # Check all the coding style.
 .PHONY: lint
 lint:
 	trunk check -a
-
-# Check the coding style for the shell scripts.
-.PHONY: lint-shell
-lint-shell:
-	shellcheck ./dev/*.sh
-
-# Check the coding style for the python files.
-.PHONY: lint-python
-lint-python:
-	bash ./dev/lint_python.sh
 
 # Format source codes
 .PHONY: format
@@ -72,3 +68,9 @@ publish:
 .PHONY: test-publish
 test-publish:
 	bash ./dev/publish.sh "testpypi"
+
+.PHONY: scan-vulnerabilities
+scan-vulnerabilities:
+	trivy fs .
+	osv-scanner scan -r .
+	grype .

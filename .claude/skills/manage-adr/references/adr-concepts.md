@@ -1,27 +1,21 @@
-# Architecture Decision Records (ADRs)
+# ADR concepts (this repository)
 
-An Architecture Decision Record (ADR) is a short text file that captures an important architectural decision made along with its context and consequences.
+Architecture Decision Records document **why** a significant choice was made, not a
+mirror of implementation files.
 
-## Why use ADRs?
+## Canonical in-repo entry
 
-- **Historical Context**: Understand _why_ a decision was made months or years later.
-- **Onboarding**: Help new team members understand the architectural evolution.
-- **Alignment**: Ensure everyone is on the same page regarding technical choices.
-- **Avoiding Regressions**: Prevent re-litigating old decisions without new context.
+- [ADR 0001 — Record architecture decisions](../../../../docs/adr/0001-record-architecture-decisions.md) — adopts ADRs for this project.
 
-## ADR Structure (Nygard Format)
+## External background
 
-1. **Title**: Number and short noun phrase (e.g., "1. Record architecture decisions").
-2. **Status**: Proposed, Accepted, Superseded, etc.
-3. **Context**: The situation and the problem being solved.
-4. **Decision**: The chosen solution.
-5. **Consequences**: The results of the decision (good and bad).
+- [Documenting architecture decisions (Michael Nygard)](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions)
+- [adr-tools](https://github.com/npryce/adr-tools) — CLI for numbering, linking, and TOC
 
-## Managing Lifecycle
+## Local policy
 
-- **Superseding**: When a new decision replaces an old one, the old one is marked as "Superseded" and links to the new one.
-- **Linking**: Related decisions should be linked (e.g., "Amends", "Depends on").
+Decision-first authoring and drift handling are defined in:
 
-## Tools
-
-We use `adr-tools` to manage these records. It handles numbering, linking, and status updates automatically.
+- [`.claude/skills/manage-adr/SKILL.md`](../SKILL.md) — what belongs in an ADR
+- [`references/adr-granularity.md`](adr-granularity.md) — examples and heuristics
+- [`.claude/commands/mend-adr.md`](../../../commands/mend-adr.md) — intent-first drift checks

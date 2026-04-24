@@ -7,11 +7,13 @@ exclude = [
   ".git",
   ".venv",
   ".mypy_cache",
+  ".ruff_cache",
+  ".pyright",
   ".pytest_cache",
   ".github",
   ".trunk",
-  "tests",
   "dev",
+  "src/your_package/tests",
   "dist",
   ".python-version",
 ]
@@ -48,12 +50,25 @@ dependencies = []
 
 [project.scripts]
 
+[tool.pytest.ini_options]
+testpaths = ["src/your_package/tests"]
+
 [dependency-groups]
 dev = [
   "xenon>=0.9.3",
   "pytest>=8.3.5",
   "bandit>=1.8.3",
-  "ruff>=0.9.10",
-  "mypy>=1.15.0",
+  "ruff>=0.15.0",
+  "pyright>=1.1.0",
   "pylint>=3.3.5",
 ]
+
+[tool.pyright]
+include = ["src"]
+extraPaths = ["src"]
+pythonVersion = "3.13"
+typeCheckingMode = "standard"
+venvPath = "."
+venv = ".venv"
+reportMissingImports = true
+reportMissingTypeStubs = "warning"
