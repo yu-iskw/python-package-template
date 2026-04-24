@@ -37,6 +37,11 @@ lint:
 format:
 	trunk fmt -a
 
+# Find unused code (Vulture; reads [tool.vulture] in pyproject.toml).
+.PHONY: dead-code vulture
+dead-code vulture:
+	uv run vulture
+
 # Run the unit tests.
 .PHONY: test
 test:
