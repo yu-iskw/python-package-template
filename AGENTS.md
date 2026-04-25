@@ -84,6 +84,30 @@ make clean        # Clean build artifacts
 - Commit `uv.lock` (do not gitignore it)
 - If Trunk errors about a missing tool, run `trunk install`
 
+## Cloud agent bootstrap (Trunk hooks + CI parity)
+
+To reduce cloud-agent CI failures, every coding session (Codex cloud, Claude Code cloud, Cursor cloud, Copilot coding agent) should run this bootstrap **before editing files**:
+
+```bash
+uv sync
+uv run trunk install
+uv run trunk git-hooks install
+```
+
+Then run this pre-commit gate before creating commits/PRs:
+
+```bash
+uv run trunk fmt --all
+uv run trunk check --all
+make test
+```
+
+Rules for agents:
+
+- Treat a missing hook installation as a setup failure and install hooks in the current repo before proceeding.
+- If hooks cannot be installed in an ephemeral/cloud environment, run the same Trunk commands explicitly in-session and report that limitation in the PR.
+- Prefer `uv run ...` over globally installed Trunk binaries to avoid version drift versus CI.
+
 ## Parallel or multi-step work (Claude Code)
 
 - This repo does **not** ship a built-in parallel orchestration subagent. For concurrent work, use multiple Task invocations, your editor’s multi-agent features, or your own scripts.
