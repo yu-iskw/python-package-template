@@ -25,7 +25,8 @@
         "./.pytest_cache",
         "./.trunk",
         "./build",
-        "./dist"
+        "./dist",
+        "./.git/hooks"
       ]
     },
     "network": {
@@ -67,8 +68,7 @@
       "Bash(sudo *)",
       "Bash(curl * | bash)",
       "Bash(wget * | bash)",
-      "Bash(git commit*)",
-      "Bash(git push*)"
+      "Bash(git push --force*)"
     ]
   },
   "hooks": {
@@ -95,6 +95,16 @@
             "type": "command",
             "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-python.sh",
             "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "trunk git-hooks sync 2>/dev/null || true"
           }
         ]
       }

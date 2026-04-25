@@ -27,6 +27,24 @@ make build        # Build the package
 make clean        # Clean build artifacts
 ```
 
+## Pre-commit checklist (required for all agents)
+
+After cloning or starting a new session, run once to install dependencies and Trunk git hooks:
+
+```bash
+make setup   # installs deps AND Trunk git hooks (trunk git-hooks sync)
+```
+
+Before every `git commit`, run in this order:
+
+```bash
+make format  # auto-fix formatting  (trunk fmt -a)
+make lint    # fail fast on errors  (trunk check -a)
+make test    # ensure tests pass
+```
+
+Never commit if `make lint` fails — this mirrors the `trunk_check.yml` CI gate exactly.
+
 ## Code style
 
 - Follow the Google Python Style Guide (see `.pylintrc`)

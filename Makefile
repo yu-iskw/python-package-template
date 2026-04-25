@@ -14,12 +14,17 @@
 
 # Set up an environment
 .PHONY: setup
-setup: setup-python
+setup: setup-python install-hooks
 
 # Set up the python environment.
 .PHONY: setup-python
 setup-python:
 	bash ./dev/setup.sh --deps "development"
+
+# Install Trunk git hooks (trunk-fmt-pre-commit, trunk-check-pre-push).
+.PHONY: install-hooks
+install-hooks:
+	trunk git-hooks sync
 
 # Upgrade Python dependencies (refresh uv.lock, then sync like development setup).
 .PHONY: upgrade-deps
