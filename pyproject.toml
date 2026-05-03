@@ -57,6 +57,7 @@ testpaths = ["src/your_package/tests"]
 dev = [
   "xenon>=0.9.3",
   "pytest>=8.3.5",
+  "pytest-cov>=6.0",
   "bandit>=1.8.3",
   "ruff>=0.15.0",
   "pyright>=1.1.0",
@@ -77,3 +78,11 @@ reportMissingTypeStubs = "warning"
 [tool.vulture]
 paths = ["src/your_package"]
 min_confidence = 80
+
+[tool.coverage.run]
+branch = true
+source = ["src/your_package"]
+
+[tool.coverage.report]
+show_missing = true
+omit = ["*/tests/*"]
