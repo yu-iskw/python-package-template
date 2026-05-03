@@ -13,6 +13,7 @@ exclude = [
   ".github",
   ".trunk",
   "dev",
+  "reports",
   "src/your_package/tests",
   "dist",
   ".python-version",
@@ -53,8 +54,41 @@ dependencies = []
 [tool.pytest.ini_options]
 testpaths = ["src/your_package/tests"]
 
+[tool.coverage.run]
+branch = true
+source = ["src/your_package"]
+omit = [
+  "src/your_package/tests/*",
+  "*/tests/*",
+  "*/__main__.py",
+]
+
+[tool.coverage.report]
+fail_under = 85
+precision = 2
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if TYPE_CHECKING:",
+  "if __name__ == \"__main__\":",
+  "raise NotImplementedError",
+]
+
+[tool.coverage.html]
+directory = "reports/coverage/html"
+
+[tool.coverage.xml]
+output = "reports/coverage/coverage.xml"
+
+[tool.coverage.json]
+output = "reports/coverage/coverage.json"
+pretty_print = true
+
 [dependency-groups]
 dev = [
+  "coverage[toml]>=7.6.0",
+  "pytest-cov>=7.0.0",
+  "radon>=6.0.1",
   "xenon>=0.9.3",
   "pytest>=8.3.5",
   "bandit>=1.8.3",
