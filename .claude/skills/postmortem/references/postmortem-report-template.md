@@ -36,4 +36,7 @@ Include only the following sections in the chat postmortem. **Do not** include t
 
 ### Suggested documentation or skill updates
 
-- Either **None warranted** or, if guardrail (3) applies, **Target file** + **Proposed addition** (short snippet only).
+- Either **None warranted** or, if guardrail (3) applies, for **each** proposed change list:
+  - **Target file** (for example `AGENTS.md`, `.claude/skills/<name>/SKILL.md`)
+  - **Recurrence signal** (two-session repeat, or single-session systematic gap—see postmortem skill)
+  - **Proposed addition** (short copy-paste snippet only)

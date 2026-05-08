@@ -42,6 +42,16 @@ make clean        # Clean build artifacts
 - Run `make test` before commits
 - Aim for meaningful coverage on critical paths
 
+## Agent verification gates
+
+Authoritative checks agents must follow before claiming lint or tests **passed**. Operational detail lives in skills (`lint-and-fix`, `test-and-fix`, `setup-dev-env`); this section is the single policy summary.
+
+- **Working directory:** Run `make lint`, `make test`, `make setup`, and full verification from the **repository root** unless the task explicitly scopes paths.
+- **Success claims:** Do not report green lint or tests without having run the corresponding Make targets (or the equivalent commands below). If a phase is skipped or blocked (missing binary, network), say **SKIPPED/BLOCKED** with reason—same contract as the **`verifier`** subagent ([`.claude/agents/verifier.md`](.claude/agents/verifier.md)).
+- **uv:** Use `uv run …` with the project virtualenv after `make setup`. If `uv` is not on `PATH` (common after `pip install --user uv`), prepend **`$HOME/.local/bin`** to `PATH`, or invoke **`python3 -m uv`** when that module is available.
+- **Trunk:** Prefer **`make lint`** / **`make format`** when `trunk` is on `PATH`. If `trunk` is missing, use the NPM launcher described in the **`lint-and-fix`** skill (`npx --yes @trunkio/launcher …` with the same subcommands as the CLI)—do not assume `make lint` works until `trunk` resolves.
+- **Heavy verification:** After substantive or overlapping edits, use the **`verifier`** subagent to run **build → lint → test → dependency scan → CodeQL** via its delegated skills.
+
 ## Security
 
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
@@ -58,7 +68,7 @@ make clean        # Clean build artifacts
 ## Session postmortem (coding agents)
 
 - **Purpose:** After a substantive session, run a retrospective so failures and inefficiencies surface as ranked **Must / Should / Consider** improvements. Template: [`.agents/skills/postmortem/references/postmortem-report-template.md`](.agents/skills/postmortem/references/postmortem-report-template.md).
-- **Invocation:** Invoke the `postmortem` skill (e.g. **`/postmortem`** in Claude Code). Load from [`.claude/skills/postmortem/`](.claude/skills/postmortem/) or [`.agents/skills/postmortem/`](.agents/skills/postmortem/) depending on your tool. Keep output **in chat** unless the user asks to persist; the skill does not authorize editing `AGENTS.md`, `CLAUDE.md`, or skills without a separate request.
+- **Invocation:** Invoke the `postmortem` skill (e.g. **`/postmortem`** in Claude Code). Load from [`.claude/skills/postmortem/`](.claude/skills/postmortem/) or [`.agents/skills/postmortem/`](.agents/skills/postmortem/) depending on your tool. Keep output **in chat** unless the user asks to persist; the skill does not authorize editing `AGENTS.md`, `CLAUDE.md`, or skills **by itself**—apply edits only when the user explicitly asks to implement changes (see **Postmortem → repo promotion** in [`.claude/skills/postmortem/SKILL.md`](.claude/skills/postmortem/SKILL.md)).
 - **Skip:** Do **not** run after purely mechanical work with no learning signal (e.g. obvious typo, format-only pass, trivial dependency bump with no retries). If the session included debugging, ambiguity, or retries, run a postmortem anyway.
 
 ## Git workflow
@@ -117,6 +127,15 @@ Slash-invoked skills live under [`.claude/skills/<name>/SKILL.md`](.claude/skill
 
 Some tools load mirrored skills under `.agents/skills/` instead of `.claude/`. Other repos may add `manage-changelog` when Changie is configured (see **Git workflow**).
 
+### Skill edit checklist
+
+Before merging edits to any `.claude/skills/<name>/SKILL.md` (or mirrored `.agents/skills/`):
+
+- **Policy alignment:** Commands and success criteria match **Agent verification gates** above and [Makefile](Makefile) targets; no conflicting “green” definition.
+- **Environment:** Document missing-tool fallbacks (e.g. Trunk via `npx`, `uv` PATH) when the skill runs shell commands—cite **Agent verification gates** instead of duplicating long policy.
+- **References:** Link to [AGENTS.md](AGENTS.md) for repo-wide rules; keep skill files procedural.
+- **Quality:** Run **`make lint`** (or skill-equivalent) on substantive Markdown changes when Trunk formats/lints them.
+
 ## Coding agents & instruction files
 
 | Product / channel                                   | How this repo is wired                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -131,7 +150,7 @@ Some tools load mirrored skills under `.agents/skills/` instead of `.claude/`. O
 
 ### Where things live (quick map)
 
-- **This file** — Stack, `make` targets, style, testing, security, git, ADR pointers, Claude subagent/skill tables
+- **This file** — Stack, `make` targets, style, testing, **Agent verification gates**, security, git, ADR pointers, Claude subagent/skill tables, skill edit checklist
 - **[CLAUDE.md](CLAUDE.md)** + **[`.claude/`](.claude/)** — Claude Code entrypoint and automation layout (see CLAUDE.md for directory breakdown and self-improvement rules)
 - **`.agents/skills/`** — Skills for tools that do not read `.claude/` (e.g. `postmortem`); may mirror `.claude/skills/`
 - **`.gemini/settings.json`** — Gemini CLI project context

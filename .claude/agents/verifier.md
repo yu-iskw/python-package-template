@@ -23,6 +23,12 @@ The YAML **`skills`** list above preloads the matching slash skills for this run
 
 Operate from the **git repository root** for the checkout you are verifying. Individual skills state any extra context (for example path assumptions).
 
+### Policy and environment (read first)
+
+- Follow **[AGENTS.md](../../AGENTS.md) → Agent verification gates**: repo-root commands, honest **PASS/FAIL/SKIPPED**, no claiming lint or tests passed without running them (or documenting why a phase is blocked).
+- **`uv`:** If missing from `PATH`, prepend `$HOME/.local/bin` or use `python3 -m uv` when available—alignment with setup flows that install `uv` via pip.
+- **Trunk:** When `trunk` is not on `PATH`, delegated **`lint-and-fix`** should use **`npx --yes @trunkio/launcher`** per that skill; do not assume **`make lint`** succeeds until Trunk is usable.
+
 ## How to use skills (delegation)
 
 For each phase below you **must** delegate to the named skill:
