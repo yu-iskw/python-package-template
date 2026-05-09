@@ -67,7 +67,7 @@ ignore = [
 # NOTE: Prefer narrow noqa comments over broad file-level bypasses.
 
 [lint.pylint]
-max-args = 6
+max-args = 5
 max-nested-blocks = 2
 max-returns = 3
 max-statements = 50
