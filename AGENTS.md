@@ -50,6 +50,7 @@ Authoritative checks agents must follow before claiming lint or tests **passed**
 - **Success claims:** Do not report green lint or tests without having run the corresponding Make targets (or the equivalent commands below). If a phase is skipped or blocked (missing binary, network), say **SKIPPED/BLOCKED** with reason—same contract as the **`verifier`** subagent ([`.claude/agents/verifier.md`](.claude/agents/verifier.md)).
 - **uv:** Use `uv run …` with the project virtualenv after `make setup`. If `uv` is not on `PATH` (common after `pip install --user uv`), prepend **`$HOME/.local/bin`** to `PATH`, or invoke **`python3 -m uv`** when that module is available.
 - **Trunk:** Prefer **`make lint`** / **`make format`** when `trunk` is on `PATH`. If `trunk` is missing, use the NPM launcher described in the **`lint-and-fix`** skill (`npx --yes @trunkio/launcher …` with the same subcommands as the CLI)—do not assume `make lint` works until `trunk` resolves.
+- **Trunk cold start / triage:** Managed tools cache under **`~/.cache/trunk`**; on a **fresh** environment run **`install`** once before trusting the first **`check`**. If **`check`** is red, triage **tool failures** (for example Semgrep) via **`.trunk/out/*.yaml`** before editing sources—see **`lint-and-fix`**.
 - **Heavy verification:** After substantive or overlapping edits, use the **`verifier`** subagent to run **build → lint → test → dependency scan → CodeQL** via its delegated skills.
 
 ## Security

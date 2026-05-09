@@ -24,7 +24,11 @@ Resolve how you invoke Trunk **once** at the start of the loop:
 
 **Order before asserting lint is green:** Resolve **`trunk` vs `npx`** → run **`install`** when linters may be missing or this is a cold cache → then run **`check`** / **`fmt`**. Do not claim lint passed until **`check`** completes successfully **or** you report **SKIPPED/BLOCKED** with reason per **[AGENTS.md](../../../AGENTS.md) Agent verification gates**.
 
+**Fresh/cold environments (must):** On a **new** agent session, container, or machine with an empty or missing **`~/.cache/trunk`**, always run **`npx … install`** (or **`trunk install`** when the launcher binary exists) **once** before you treat the **first** **`check`** exit code as meaningful. Without **`install`**, **`check`** can fail or flap because managed linters are not yet present.
+
 **Cold runs:** On first use or large repos, run **`npx --yes @trunkio/launcher install`** (or `trunk install` when `trunk` exists) before a full **`check -a`** so downloads settle. Do not pipe **`trunk check`** to **`tail`** or similar until the process exits, or you may see no useful output for a long time.
+
+**Repeat runs / cache (consider):** Trunk stores downloads under **`~/.cache/trunk`** (typical on Linux/macOS). **Long-lived** workspaces and later iterations in the same session usually run **`check`** faster than the first cold run; repeat **`install`** only after **`.trunk/trunk.yaml`** / plugin changes, toolchain errors, or obvious cache corruption.
 
 **Docs-only / narrow validation:** For Markdown or small edits, prefer **`npx … check <path> [<path> …]`** (or **`make lint`** with the same scope if supported) instead of always **`check -a`**. Optionally wrap long checks with your shell’s **`timeout`** so runs cannot hang silently.
 
@@ -33,8 +37,8 @@ Resolve how you invoke Trunk **once** at the start of the loop:
 If **`check`** exits non-zero:
 
 1. Read Trunk’s summary for **FAILURES** vs **NOTICES** (for example “Some tools failed to run”).
-2. Open the referenced **`.trunk/out/*.yaml`** files when Trunk prints them—separate **tool/runtime failures** (Semgrep, missing binary, network) from **real findings** on your sources.
-3. **Do not** “fix” Markdown or code to satisfy a linter that did not actually run; resolve tooling (**`install`**, environment, retries) or state **SKIPPED/BLOCKED** per gates.
+2. Open the referenced **`.trunk/out/*.yaml`** files **before** editing sources (for example **`SKILL.md`**). Separate **tool/runtime failures** (**Semgrep** failing to run, missing binary, network) from **real rule hits** on your files—YAML paths listed next to **Semgrep** in the summary usually contain the distinction.
+3. **Do not** “fix” Markdown or code to satisfy **Semgrep** (or any linter) that did not actually complete; resolve tooling (**`install`**, environment, retries) or state **SKIPPED/BLOCKED** per gates.
 4. When findings are real, fix code/types/docs as usual.
 
 ## Loop Logic
