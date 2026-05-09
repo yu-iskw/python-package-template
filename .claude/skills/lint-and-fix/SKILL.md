@@ -22,14 +22,27 @@ Resolve how you invoke Trunk **once** at the start of the loop:
    - `npx --yes @trunkio/launcher install` when managed linters are missing (`trunk install` equivalent).
 3. When **`trunk` is missing**, **`make lint`** / **`make format`** will fail—use the **`npx …`** commands above instead of Make for those steps until Trunk works.
 
+**Order before asserting lint is green:** Resolve **`trunk` vs `npx`** → run **`install`** when linters may be missing or this is a cold cache → then run **`check`** / **`fmt`**. Do not claim lint passed until **`check`** completes successfully **or** you report **SKIPPED/BLOCKED** with reason per **[AGENTS.md](../../../AGENTS.md) Agent verification gates**.
+
 **Cold runs:** On first use or large repos, run **`npx --yes @trunkio/launcher install`** (or `trunk install` when `trunk` exists) before a full **`check -a`** so downloads settle. Do not pipe **`trunk check`** to **`tail`** or similar until the process exits, or you may see no useful output for a long time.
+
+**Docs-only / narrow validation:** For Markdown or small edits, prefer **`npx … check <path> [<path> …]`** (or **`make lint`** with the same scope if supported) instead of always **`check -a`**. Optionally wrap long checks with your shell’s **`timeout`** so runs cannot hang silently.
+
+## Non-zero `trunk check` (triage)
+
+If **`check`** exits non-zero:
+
+1. Read Trunk’s summary for **FAILURES** vs **NOTICES** (for example “Some tools failed to run”).
+2. Open the referenced **`.trunk/out/*.yaml`** files when Trunk prints them—separate **tool/runtime failures** (Semgrep, missing binary, network) from **real findings** on your sources.
+3. **Do not** “fix” Markdown or code to satisfy a linter that did not actually run; resolve tooling (**`install`**, environment, retries) or state **SKIPPED/BLOCKED** per gates.
+4. When findings are real, fix code/types/docs as usual.
 
 ## Loop Logic
 
 1. **Identify**:
-   - Run **`make lint`** **or** **`npx --yes @trunkio/launcher check -a`** per **Trunk CLI resolution**.
+   - Run **`make lint`** **or** **`npx --yes @trunkio/launcher check -a`** (or a **scoped** `check <paths>`) per **Trunk CLI resolution**.
    - Run dead-code detection: **`make dead-code`** (alias **`make vulture`**, runs **`uv run vulture`** using `[tool.vulture]` in `pyproject.toml`). Fix unused code by removing it or using it—do not widen Vulture excludes unless the user asked for that policy change.
-2. **Analyze**: Examine Trunk and Vulture output (path, line, message).
+2. **Analyze**: Examine Trunk and Vulture output (path, line, message). If **`check`** failed, follow **Non-zero `trunk check` (triage)** before editing files.
 3. **Fix**:
    - For formatting, **`make format`** **or** **`npx --yes @trunkio/launcher fmt -a`**.
    - For lint findings, apply the minimum code change; resolve via code/types/imports/structure—not suppressions (see **Constraints**).
@@ -66,6 +79,12 @@ Resolve how you invoke Trunk **once** at the start of the loop:
 
 1. **`make lint`** fails with `trunk: command not found`.
 2. Run **`npx --yes @trunkio/launcher install`**, then **`npx --yes @trunkio/launcher check -a`** and continue the loop with **`npx … fmt -a`** for formatting.
+
+### Scenario: `check` exits non-zero but tools failed
+
+1. Trunk reports **NOTICES** / **Semgrep** failures and paths under **`.trunk/out/`**.
+2. Read those YAML summaries; if the linter did not run, fix environment or **`install`**—do not rewrite sources as if Semgrep reported style issues.
+3. Re-run **`check`** after tooling works.
 
 ## Resources
 
