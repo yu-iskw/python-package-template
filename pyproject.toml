@@ -63,6 +63,7 @@ dev = [
   "pyright>=1.1.0",
   "pylint>=3.3.5",
   "vulture>=2.16",
+  "ssort>=0.16.0",
 ]
 
 [tool.pyright]
