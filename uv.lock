@@ -385,6 +385,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pathspec"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5a/82/42f767fc1c1143d6fd36efb827202a2d997a375e160a71eb2888a925aac1/pathspec-1.1.1.tar.gz", hash = "sha256:17db5ecd524104a120e173814c90367a96a98d07c45b2e10c2f3919fff91bf5a", size = 135180, upload-time = "2026-04-27T01:46:08.907Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/d9/7fb5aa316bc299258e68c73ba3bddbc499654a07f151cba08f6153988714/pathspec-1.1.1-py3-none-any.whl", hash = "sha256:a00ce642f577bf7f473932318056212bc4f8bfdf53128c78bbd5af0b9b20b189", size = 57328, upload-time = "2026-04-27T01:46:07.06Z" },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.9.6"
 source = { registry = "https://pypi.org/simple" }
@@ -615,6 +624,18 @@ wheels = [
 ]
 
 [[package]]
+name = "ssort"
+version = "0.16.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pathspec" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7a/c0/696b3c20b58f4a536845bbfded3be1d7a2b99e622ac51755e402c43729f0/ssort-0.16.0.tar.gz", hash = "sha256:1e7222cf7ffbbb0523d88fe1931a36b0bbd7f478d2964feb25be3621c52a981f", size = 23252, upload-time = "2025-12-07T02:20:00.092Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5c/45/a23b1c13f2416e060af4d90e8407a350d5da7ad1ccf33e6eb9cbaaf7b363/ssort-0.16.0-py3-none-any.whl", hash = "sha256:013d57d4a0e4bde896afbcaa1e9e98a6829bf1b63ddcccecfcb7e64336921bba", size = 27683, upload-time = "2025-12-07T02:19:59.139Z" },
+]
+
+[[package]]
 name = "stevedore"
 version = "5.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -743,6 +764,7 @@ dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "ruff" },
+    { name = "ssort" },
     { name = "vulture" },
     { name = "xenon" },
 ]
@@ -757,6 +779,7 @@ dev = [
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-cov", specifier = ">=6.0" },
     { name = "ruff", specifier = ">=0.15.0" },
+    { name = "ssort", specifier = ">=0.16.0" },
     { name = "vulture", specifier = ">=2.16" },
     { name = "xenon", specifier = ">=0.9.3" },
 ]
