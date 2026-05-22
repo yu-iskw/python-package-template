@@ -46,7 +46,8 @@ make clean        # Clean build artifacts
 
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
-- **Dependencies**: OSV-Scanner and Trivy
+- **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; versions from mise)
+- **Local CodeQL**: `make codeql` (CodeQL CLI via mise)
 - Use `trunk check` before pushing
 
 ## AI guardrails & code quality

@@ -77,6 +77,6 @@ test-publish:
 
 .PHONY: scan-vulnerabilities
 scan-vulnerabilities:
-	trivy fs .
-	osv-scanner scan -r .
-	grype .
+	$(MISE_EXEC) trivy fs .
+	$(MISE_EXEC) osv-scanner scan -r .
+	$(MISE_EXEC) grype .

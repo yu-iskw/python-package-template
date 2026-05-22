@@ -23,7 +23,8 @@ This template enforces high security and maintainability standards:
 Conventions, build commands, and AI-agent instructions: see [AGENTS.md](AGENTS.md). Claude Code–specific config lives in `CLAUDE.md` (it imports [AGENTS.md](AGENTS.md)) and in [`.claude/`](.claude/).
 
 ```bash
-make setup      # Install dependencies and set up environment
+make setup-tools  # CLI tools via mise (trunk, scanners, codeql)
+make setup        # setup-tools + Python venv (uv)
 make lint       # Run all linters via Trunk
 make format     # Auto-format code via Trunk
 make test       # Run pytest test suite

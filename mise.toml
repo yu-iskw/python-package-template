@@ -1,0 +1,23 @@
+# Toolchain managed by mise (https://mise.jdx.dev/).
+# Versions use "latest" with minimum_release_age; committed mise.lock pins resolved releases.
+#
+# Install: mise install --locked  (or: make setup-tools)
+# Refresh: mise lock && git add mise.lock
+
+[settings]
+minimum_release_age = "7d"
+lockfile = true
+
+[settings.aqua]
+cosign = false
+slsa = false
+
+[settings.github]
+github_attestations = false
+
+[tools]
+trunk = "latest"
+trivy = "latest"
+"osv-scanner" = "latest"
+grype = "latest"
+codeql = "latest"

@@ -15,15 +15,22 @@
 
 set -euo pipefail
 
+SCRIPT_FILE="$(readlink -f "$0")"
+SCRIPT_DIR="$(dirname "${SCRIPT_FILE}")"
+MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
+MISE_EXEC="${SCRIPT_DIR}/mise-exec.sh"
+
+cd "${MODULE_DIR}"
+
 # Directory for the CodeQL database
 DB_DIR=".codeql_db"
 # Results file
 RESULTS_SARIF="codeql-results.sarif"
 
-# Check if codeql is installed
-if ! command -v codeql &>/dev/null; then
+if ! "${MISE_EXEC}" codeql version &>/dev/null; then
 	echo "Error: 'codeql' command not found."
-	echo "Please install the CodeQL CLI. See: https://docs.github.com/en/code-security/codeql-cli"
+	echo "Run: make setup-tools  (mise installs codeql from mise.toml)"
+	echo "Or: https://docs.github.com/en/code-security/codeql-cli"
 	exit 1
 fi
 
@@ -36,27 +43,22 @@ if [[ -d ${DB_DIR} ]]; then
 fi
 
 # Create CodeQL database
-# Note: For Python, we don't need a build command.
+# Note: For Python, we do not need a build command.
 echo "Creating CodeQL database..."
-codeql database create "${DB_DIR}" --language=python --source-root .
+"${MISE_EXEC}" codeql database create "${DB_DIR}" --language=python --source-root .
 
 # Run Analysis
 # We use the same 'security-and-quality' suite as defined in CI.
 echo "Running CodeQL analysis (security-and-quality suite)..."
-# We use the full qualified name for the query suite to ensure it can be found/downloaded.
-codeql database analyze "${DB_DIR}" \
+"${MISE_EXEC}" codeql database analyze "${DB_DIR}" \
 	"codeql/python-queries:codeql-suites/python-security-and-quality.qls" \
 	--format=sarif-latest \
 	--output="${RESULTS_SARIF}" \
 	--download
 
-# Create a human-readable summary if possible
-# SARIF is JSON, we can extract counts or use codeql bqrs if needed,
-# but a simple message about the SARIF file is usually enough for local use.
 echo "Analysis complete."
 echo "Results saved to: ${RESULTS_SARIF}"
 
-# Optional: Print a brief summary of findings count from SARIF
 if command -v jq &>/dev/null; then
 	COUNT=$(jq '.runs[0].results | length' "${RESULTS_SARIF}")
 	echo "Total findings: ${COUNT}"

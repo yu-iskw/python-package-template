@@ -1,7 +1,7 @@
 ---
 name: security-scan
 description: Scan the repository for vulnerable dependencies and known CVEs using Trivy, OSV-Scanner, and Grype via the Makefile. Use when the user asks to scan for vulnerabilities, check dependencies for CVEs, run OSV/Trivy/Grype, or run make scan-vulnerabilities.
-compatibility: Requires `trivy`, `osv-scanner`, and `grype` on PATH (for example via Homebrew or `trunk install` if Trunk provides them in your environment). Run from the repository root after `make setup` or `uv sync` so lockfiles and manifests match what you ship.
+compatibility: Requires `trivy`, `osv-scanner`, and `grype` on PATH (prefer `make setup-tools` or `mise install --locked` per `mise.toml`). Run from the repository root after `make setup` or `uv sync` so lockfiles and manifests match what you ship.
 ---
 
 # Security scan: vulnerable dependencies
