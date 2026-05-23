@@ -33,4 +33,3 @@ make codeql       # Local CodeQL (x64 or Rosetta on ARM64; see AGENTS.md)
 ```
 
 On Linux or macOS **ARM64**, CodeQL from `mise.lock` is an x64 bundle. `make setup-tools` skips the version check; use x64 hosts or emulation for `make codeql`.
-
