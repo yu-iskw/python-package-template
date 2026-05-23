@@ -97,6 +97,8 @@ make clean        # Clean build artifacts
 - Run Python tools with `uv run …` in the project virtualenv
 - Trunk pins linter versions under `.trunk/`; `make setup-tools` runs `mise run trunk-install`
 - Commit `uv.lock` and `mise.lock` (do not gitignore them)
+- If `mise install --locked` fails locally, extra tools in `~/.config/mise/config.toml` may be missing from `mise.lock`; `make setup-tools` retries without `--locked`, or run `MISE_LOCKED=false mise install`
+
 - If Trunk errors about a missing managed linter, run `mise run trunk-install` (via `make setup-tools`)
 
 ## Parallel or multi-step work (Claude Code)

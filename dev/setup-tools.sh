@@ -33,13 +33,18 @@ source "${SCRIPT_DIR}/codeql-platform.sh"
 
 mise trust --yes "${MODULE_DIR}/mise.toml" 2>/dev/null || mise trust "${MODULE_DIR}"
 
-LOCK_ARGS=()
-if [[ -f "${MODULE_DIR}/mise.lock" ]]; then
-	LOCK_ARGS=(--locked)
-fi
-
 echo "--- Installing toolchain via mise (mise.toml + mise.lock) ---"
-mise install "${LOCK_ARGS[@]}"
+# --locked is preferred for reproducibility; global ~/.config/mise tools not in mise.lock
+# can make strict locked install fail (mise settings are global). CI uses --locked via smoke test.
+if [[ -f "${MODULE_DIR}/mise.lock" ]]; then
+	if ! MISE_LOCKED=false mise install --locked; then
+		echo "Note: mise install --locked failed (often extra tools in global mise config)." >&2
+		echo "  Retrying: MISE_LOCKED=false mise install" >&2
+		MISE_LOCKED=false mise install
+	fi
+else
+	MISE_LOCKED=false mise install
+fi
 
 echo "--- Installing Trunk-managed linters (mise run trunk-install) ---"
 mise run trunk-install

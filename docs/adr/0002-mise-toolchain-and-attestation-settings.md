@@ -40,3 +40,7 @@ In some environments (restricted CI, air-gapped networks), Sigstore/TUF and GitH
 ## Vulnerability scans
 
 `mise run scan-vulnerabilities` runs Trivy, OSV-Scanner, and Grype **serially** to avoid cache/DB contention. OSV-Scanner exits **1** when vulnerabilities are reported (expected gate).
+
+## Global mise config and `--locked`
+
+`make setup-tools` tries `mise install --locked` first, then falls back to `MISE_LOCKED=false mise install` when strict locked mode fails (for example global tools in `~/.config/mise/config.toml` that are not listed in this repo's `mise.lock`). CI smoke tests still require `mise install --locked` on a clean runner.
