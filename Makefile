@@ -33,9 +33,11 @@ upgrade-deps:
 	uv sync --all-extras
 
 # Check all the coding style.
-.PHONY: lint
+.PHONY: lint lint-python
 lint:
 	mise run lint
+
+lint-python: lint
 
 # Format source codes
 .PHONY: format

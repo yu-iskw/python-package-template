@@ -8,7 +8,7 @@ compatibility: Requires `trivy`, `osv-scanner`, and `grype` on PATH (prefer `mak
 
 ## Purpose
 
-Run the template’s **filesystem and dependency vulnerability** checks in one place. The canonical entry point is [`Makefile`](../../../Makefile) target **`scan-vulnerabilities`**, which runs **`mise run scan-vulnerabilities`** (Trivy, OSV-Scanner, and Grype in parallel via `mise.toml` tasks).
+Run the template’s **filesystem and dependency vulnerability** checks in one place. The canonical entry point is [`Makefile`](../../../Makefile) target **`scan-vulnerabilities`**, which runs **`mise run scan-vulnerabilities`** (Trivy, OSV-Scanner, and Grype serially via `mise.toml` (`scan-trivy`, then `scan-osv`, then `scan-grype`)).
 
 ## When to use
 

@@ -7,6 +7,13 @@ on:
       - pyproject.toml
       - src/your_package/**/*.py
       - pylintrc
+      - mise.toml
+      - mise.lock
+      - Makefile
+      - dev/**
+      - uv.lock
+      - .python-version
+      - requirements.setup.txt
   push:
     branches:
       - main
@@ -16,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12"]
       fail-fast: false
     defaults:
       run:

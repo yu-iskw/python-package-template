@@ -22,12 +22,8 @@ assert() {
 	fi
 }
 
-codeql_os="$(uname -s)"
-codeql_arch="$(uname -m)"
-codeql_run_version_check=true
-if [[ ${codeql_os} == "Linux" && (${codeql_arch} == "aarch64" || ${codeql_arch} == "arm64") ]]; then
-	codeql_run_version_check=false
-fi
+# shellcheck source=dev/codeql-platform.sh
+source "${SCRIPT_DIR}/codeql-platform.sh"
 
 echo "=== mise toolchain smoke tests ==="
 
@@ -51,15 +47,18 @@ assert "grype via mise exec" mise exec grype@ -- grype version
 if [[ ${codeql_run_version_check} == "true" ]]; then
 	assert "codeql via mise exec" mise exec codeql@ -- codeql version
 else
-	echo "SKIP: codeql version on Linux ARM64 (x64 bundle in mise.lock)"
+	echo "SKIP: codeql version on ARM64 ${codeql_os}/${codeql_arch} (x64 bundle in mise.lock)"
 	PASS=$((PASS + 1))
 fi
 
+TRIVY_PIN="$(sed -n 's/.*- trivy@\([0-9.]*\).*/\1/p' .trunk/trunk.yaml | head -1)"
+OSV_PIN="$(sed -n 's/.*- osv-scanner@\([0-9.]*\).*/\1/p' .trunk/trunk.yaml | head -1)"
+assert "trunk.yaml pins trivy version" test -n "${TRIVY_PIN}"
+assert "trunk.yaml pins osv-scanner version" test -n "${OSV_PIN}"
 TRIVY_VER="$(mise exec trivy@ -- trivy --version 2>&1 | head -1)"
-assert "trivy matches trunk.yaml (0.70.0)" grep -q '0.70.0' <<<"${TRIVY_VER}"
-
+assert "trivy version matches trunk.yaml (${TRIVY_PIN})" grep -qF "${TRIVY_PIN}" <<<"${TRIVY_VER}"
 OSV_VER="$(mise exec osv-scanner@ -- osv-scanner --version 2>&1 | head -1)"
-assert "osv-scanner matches trunk.yaml (2.3.8)" grep -q '2.3.8' <<<"${OSV_VER}"
+assert "osv-scanner version matches trunk.yaml (${OSV_PIN})" grep -qF "${OSV_PIN}" <<<"${OSV_VER}"
 
 assert "Makefile defines setup-tools" grep -q '^setup-tools:' Makefile
 assert "Makefile uses mise run lint" grep -q 'mise run lint' Makefile
