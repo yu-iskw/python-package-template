@@ -46,7 +46,8 @@ make clean        # Clean build artifacts
 
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
-- **Dependencies**: OSV-Scanner and Trivy
+- **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; versions from mise)
+- **Local CodeQL**: `make codeql` (CodeQL CLI via mise)
 - Use `trunk check` before pushing
 
 ## AI guardrails & code quality
@@ -79,12 +80,10 @@ make clean        # Clean build artifacts
 
 ## Common gotchas
 
-- After clone: run `mise trust`, then `mise install --locked` (or `make setup-tools` / `make setup`)
-- Refresh the toolchain lock with `mise lock` and commit `mise.lock` when bumping CLI tools
-- Run Python tools with `uv run …` in the project virtualenv
-- Trunk pins linter versions under `.trunk/`; `make setup-tools` also runs `trunk install`
-- Commit `uv.lock` and `mise.lock` (do not gitignore them)
-- If Trunk errors about a missing managed linter, run `trunk install` (included in `make setup-tools`)
+- Run tools with `uv run …` in the project virtualenv
+- Trunk pins tool versions: avoid installing the same linters globally
+- Commit `uv.lock` (do not gitignore it)
+- If Trunk errors about a missing tool, run `trunk install`
 
 ## Parallel or multi-step work (Claude Code)
 
