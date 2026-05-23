@@ -30,24 +30,26 @@ assert "mise on PATH" command -v mise
 assert "mise trust" mise trust --yes "${MODULE_DIR}/mise.toml"
 assert "mise install --locked" mise install --locked
 
+assert "mise-exec.sh removed" test ! -e dev/mise-exec.sh
 assert "setup-tools.sh executable" test -x dev/setup-tools.sh
-assert "mise-exec.sh executable" test -x dev/mise-exec.sh
 
-assert "trunk via mise-exec" ./dev/mise-exec.sh trunk --version
-assert "trivy via mise-exec" ./dev/mise-exec.sh trivy --version
-assert "osv-scanner via mise-exec" ./dev/mise-exec.sh osv-scanner --version
-assert "grype via mise-exec" ./dev/mise-exec.sh grype version
-assert "codeql via mise-exec" ./dev/mise-exec.sh codeql version
+assert "mise.toml defines lint task" grep -q '^\[tasks\.lint\]' mise.toml
+assert "mise.toml defines scan-vulnerabilities task" grep -q '^\[tasks\.scan-vulnerabilities\]' mise.toml
 
-TRIVY_VER="$(./dev/mise-exec.sh trivy --version 2>&1 | head -1)"
+assert "trunk via mise run trunk-install (dry)" mise exec trunk@ -- trunk --version
+assert "trivy via mise exec" mise exec trivy@ -- trivy --version
+assert "osv-scanner via mise exec" mise exec osv-scanner@ -- osv-scanner --version
+assert "grype via mise exec" mise exec grype@ -- grype version
+assert "codeql via mise exec" mise exec codeql@ -- codeql version
+
+TRIVY_VER="$(mise exec trivy@ -- trivy --version 2>&1 | head -1)"
 assert "trivy matches trunk.yaml (0.70.0)" grep -q '0.70.0' <<<"${TRIVY_VER}"
 
-OSV_VER="$(./dev/mise-exec.sh osv-scanner --version 2>&1 | head -1)"
+OSV_VER="$(mise exec osv-scanner@ -- osv-scanner --version 2>&1 | head -1)"
 assert "osv-scanner matches trunk.yaml (2.3.8)" grep -q '2.3.8' <<<"${OSV_VER}"
 
 assert "Makefile defines setup-tools" grep -q '^setup-tools:' Makefile
-assert "Makefile defines MISE_EXEC" grep -q '^MISE_EXEC' Makefile
-assert "mise-exec scopes to single tool" grep -q 'mise exec "${tool}@"' dev/mise-exec.sh
+assert "Makefile uses mise run lint" grep -q 'mise run lint' Makefile
 
 echo ""
 echo "=== results: ${PASS} passed, ${FAIL} failed ==="

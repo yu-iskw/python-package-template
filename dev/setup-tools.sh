@@ -18,7 +18,6 @@ set -Eeuo pipefail
 SCRIPT_FILE="$(readlink -f "$0")"
 SCRIPT_DIR="$(dirname "${SCRIPT_FILE}")"
 MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
-MISE_EXEC="${SCRIPT_DIR}/mise-exec.sh"
 
 cd "${MODULE_DIR}"
 
@@ -39,12 +38,12 @@ fi
 echo "--- Installing toolchain via mise (mise.toml + mise.lock) ---"
 mise install "${LOCK_ARGS[@]}"
 
-echo "--- Installing Trunk-managed linters (trunk install) ---"
-"${MISE_EXEC}" trunk install
+echo "--- Installing Trunk-managed linters (mise run trunk-install) ---"
+mise run trunk-install
 
 echo "--- Toolchain versions ---"
-"${MISE_EXEC}" trunk --version
-"${MISE_EXEC}" trivy --version
-"${MISE_EXEC}" osv-scanner --version
-"${MISE_EXEC}" grype version
-"${MISE_EXEC}" codeql version
+mise exec trunk@ -- trunk --version
+mise exec trivy@ -- trivy --version
+mise exec osv-scanner@ -- osv-scanner --version
+mise exec grype@ -- grype version
+mise exec codeql@ -- codeql version

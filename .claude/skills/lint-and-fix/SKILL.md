@@ -11,7 +11,7 @@ An autonomous loop for the agent to identify, fix, and verify linting and format
 
 ## Trunk CLI resolution
 
-Trunk must be executable for `make lint` / `make format` (they call `trunk` directly). Resolve the command **once** at the start of the loop:
+Trunk must be executable for `make lint` / `make format` (they delegate to `mise run` tasks in `mise.toml`). Resolve the command **once** at the start of the loop:
 
 1. If `trunk` is on `PATH` (`command -v trunk`), use `trunk` (normally via mise after `make setup-tools`).
 2. Otherwise use the NPM launcher package so behavior matches [Trunk install (NPM)](https://github.com/trunk-io/docs/blob/main/code-quality/overview/cli/getting-started/install.md): run Trunk via **`npx --yes @trunkio/launcher`** with the same subcommands and arguments you would pass to `trunk` (for example `npx --yes @trunkio/launcher check -a`, `npx --yes @trunkio/launcher fmt -a`, `npx --yes @trunkio/launcher install`).

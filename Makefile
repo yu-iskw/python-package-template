@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-MISE_EXEC = ./dev/mise-exec.sh
-
 # Install CLI toolchain via mise (trunk, trivy, osv-scanner, grype, codeql)
 .PHONY: setup-tools
 setup-tools:
@@ -37,12 +35,12 @@ upgrade-deps:
 # Check all the coding style.
 .PHONY: lint
 lint:
-	$(MISE_EXEC) trunk check -a
+	mise run lint
 
 # Format source codes
 .PHONY: format
 format:
-	$(MISE_EXEC) trunk fmt -a
+	mise run format-trunk
 	uv run ssort .
 
 # Find unused code (Vulture; reads [tool.vulture] in pyproject.toml).
@@ -58,7 +56,7 @@ test coverage:
 # Run local CodeQL analysis.
 .PHONY: codeql
 codeql:
-	bash ./dev/codeql.sh
+	mise run codeql
 
 # Build the package
 .PHONY: build
@@ -84,6 +82,4 @@ test-publish:
 
 .PHONY: scan-vulnerabilities
 scan-vulnerabilities:
-	$(MISE_EXEC) trivy fs .
-	$(MISE_EXEC) osv-scanner scan -r .
-	$(MISE_EXEC) grype .
+	mise run scan-vulnerabilities

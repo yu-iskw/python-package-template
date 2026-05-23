@@ -7,7 +7,7 @@ Authoritative shared instructions for humans and coding agents. How each product
 Python package template. Tooling:
 
 - **Package manager**: [uv](https://github.com/astral-sh/uv) (via `requirements.setup.txt`, not mise)
-- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml`, `mise.lock`, `minimum_release_age = "7d"`)
+- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml` [tasks], `mise.lock`, `minimum_release_age = "7d"`)
 - **Build system**: [Hatchling](https://hatch.pypa.io/latest/)
 - **Linting/formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit, Semgrep; Ruff is the formatter; Black is not used)
 - **Testing**: [pytest](https://docs.pytest.org/)
@@ -19,9 +19,9 @@ Python package template. Tooling:
 make setup-tools  # mise: trunk, trivy, osv-scanner, grype, codeql (+ trunk install)
 make setup        # setup-tools + Python venv (uv sync)
 make setup-python # Python venv only (skip CLI toolchain)
-make lint         # Run all linters via Trunk
-make lint-python  # Same as `make lint` (trunk check)
-make format       # Auto-format code via Trunk
+make lint         # mise run lint (Trunk check)
+make lint-python  # Same as `make lint`
+make format       # mise run format-trunk + uv ssort
 make dead-code    # Find unused code with Vulture (see pyproject [tool.vulture])
 make vulture      # Same as make dead-code
 make test         # Run pytest with coverage (pytest-cov); alias: `make coverage`
@@ -83,11 +83,11 @@ make clean        # Clean build artifacts
 
 ## Common gotchas
 
-- After clone: run `mise trust`, then `mise install --locked` (or `make setup-tools` / `make setup`)
+- After clone: run `mise trust`, then `mise install --locked` (or `make setup-tools` / `make setup`); workflows are `[tasks]` in `mise.toml` (`mise run lint`, `mise tasks`)
 - Refresh the toolchain lock with `mise lock` and commit `mise.lock` when bumping CLI tools
 - Keep mise scanner versions aligned with `.trunk/trunk.yaml` (Trivy, OSV-Scanner) when bumping either side
 - Run Python tools with `uv run …` in the project virtualenv
-- Trunk pins linter versions under `.trunk/`; `make setup-tools` also runs `trunk install`
+- Trunk pins linter versions under `.trunk/`; `make setup-tools` runs `mise run trunk-install`
 - Commit `uv.lock` and `mise.lock` (do not gitignore them)
 - If Trunk errors about a missing managed linter, run `trunk install` (included in `make setup-tools`)
 
