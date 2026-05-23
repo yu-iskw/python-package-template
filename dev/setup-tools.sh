@@ -32,7 +32,7 @@ fi
 codeql_os="$(uname -s)"
 codeql_arch="$(uname -m)"
 codeql_run_version_check=true
-if [[ "${codeql_os}" == "Linux" && ( "${codeql_arch}" == "aarch64" || "${codeql_arch}" == "arm64" ) ]]; then
+if [[ "${codeql_os}" == "Linux" && ("${codeql_arch}" == "aarch64" || "${codeql_arch}" == "arm64") ]]; then
 	codeql_run_version_check=false
 fi
 
