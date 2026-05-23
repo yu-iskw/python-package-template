@@ -40,4 +40,3 @@ jobs:
           test ! -e dev/mise-exec.sh
           grep -q 'mise run lint' Makefile
           ! grep -q '^MISE_EXEC' Makefile
-

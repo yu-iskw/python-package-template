@@ -22,6 +22,14 @@ assert() {
 	fi
 }
 
+codeql_version_check_supported() {
+	[[ "$(uname -s)" != "Linux" ]] && return 0
+	case "$(uname -m)" in
+	aarch64 | arm64) return 1 ;;
+	esac
+	return 0
+}
+
 echo "=== mise toolchain smoke tests ==="
 
 assert "mise.toml exists" test -f mise.toml
@@ -40,7 +48,13 @@ assert "trunk via mise exec" mise exec trunk@ -- trunk --version
 assert "trivy via mise exec" mise exec trivy@ -- trivy --version
 assert "osv-scanner via mise exec" mise exec osv-scanner@ -- osv-scanner --version
 assert "grype via mise exec" mise exec grype@ -- grype version
-assert "codeql via mise exec" mise exec codeql@ -- codeql version
+
+if codeql_version_check_supported; then
+	assert "codeql via mise exec" mise exec codeql@ -- codeql version
+else
+	echo "SKIP: codeql version on Linux ARM64 (x64 bundle in mise.lock)"
+	PASS=$((PASS + 1))
+fi
 
 TRIVY_VER="$(mise exec trivy@ -- trivy --version 2>&1 | head -1)"
 assert "trivy matches trunk.yaml (0.70.0)" grep -q '0.70.0' <<<"${TRIVY_VER}"

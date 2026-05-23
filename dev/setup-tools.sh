@@ -28,6 +28,15 @@ if ! command -v mise &>/dev/null; then
 	exit 1
 fi
 
+# CodeQL in mise.lock uses the x64 zip for linux-arm64; the binary does not run natively on ARM64 Linux.
+codeql_version_check_supported() {
+	[[ "$(uname -s)" != "Linux" ]] && return 0
+	case "$(uname -m)" in
+	aarch64 | arm64) return 1 ;;
+	esac
+	return 0
+}
+
 mise trust --yes "${MODULE_DIR}/mise.toml" 2>/dev/null || mise trust "${MODULE_DIR}"
 
 LOCK_ARGS=()
@@ -46,4 +55,9 @@ mise exec trunk@ -- trunk --version
 mise exec trivy@ -- trivy --version
 mise exec osv-scanner@ -- osv-scanner --version
 mise exec grype@ -- grype version
-mise exec codeql@ -- codeql version
+if codeql_version_check_supported; then
+	mise exec codeql@ -- codeql version
+else
+	echo "codeql: version check skipped on Linux ARM64 (mise.lock provides x64 bundle only)." >&2
+	echo "  Install still succeeds; use x64 Linux/macOS for make codeql." >&2
+fi
