@@ -6,7 +6,8 @@ Authoritative shared instructions for humans and coding agents. How each product
 
 Python package template. Tooling:
 
-- **Package manager**: [uv](https://github.com/astral-sh/uv)
+- **Package manager**: [uv](https://github.com/astral-sh/uv) (via `requirements.setup.txt`, not mise)
+- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml`, `mise.lock`, `minimum_release_age = "7d"`)
 - **Build system**: [Hatchling](https://hatch.pypa.io/latest/)
 - **Linting/formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit, Semgrep; Ruff is the formatter; Black is not used)
 - **Testing**: [pytest](https://docs.pytest.org/)
@@ -15,7 +16,9 @@ Python package template. Tooling:
 ## Quick commands
 
 ```bash
-make setup        # Install dependencies and set up environment
+make setup-tools  # mise: trunk, trivy, osv-scanner, grype, codeql (+ trunk install)
+make setup        # setup-tools + Python venv (uv sync)
+make setup-python # Python venv only (skip CLI toolchain)
 make lint         # Run all linters via Trunk
 make lint-python  # Same as `make lint` (trunk check)
 make format       # Auto-format code via Trunk
@@ -80,10 +83,13 @@ make clean        # Clean build artifacts
 
 ## Common gotchas
 
-- Run tools with `uv run …` in the project virtualenv
-- Trunk pins tool versions: avoid installing the same linters globally
-- Commit `uv.lock` (do not gitignore it)
-- If Trunk errors about a missing tool, run `trunk install`
+- After clone: run `mise trust`, then `mise install --locked` (or `make setup-tools` / `make setup`)
+- Refresh the toolchain lock with `mise lock` and commit `mise.lock` when bumping CLI tools
+- Keep mise scanner versions aligned with `.trunk/trunk.yaml` (Trivy, OSV-Scanner) when bumping either side
+- Run Python tools with `uv run …` in the project virtualenv
+- Trunk pins linter versions under `.trunk/`; `make setup-tools` also runs `trunk install`
+- Commit `uv.lock` and `mise.lock` (do not gitignore them)
+- If Trunk errors about a missing managed linter, run `trunk install` (included in `make setup-tools`)
 
 ## Parallel or multi-step work (Claude Code)
 
