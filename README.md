@@ -27,10 +27,10 @@ make setup-tools  # mise install --locked + mise run trunk-install
 make setup        # setup-tools + Python venv (uv)
 make lint         # mise run lint (Trunk)
 make format       # mise run format-trunk + ssort
-make test       # Run pytest test suite
+make test         # Run pytest test suite
 make scan-vulnerabilities  # Trivy, OSV-Scanner, Grype (serial via mise)
 make codeql       # Local CodeQL (x64 or Rosetta on ARM64; see AGENTS.md)
 ```
 
-**Note:** On Linux or macOS **ARM64**, CodeQL from `mise.lock` is an x64 bundle—`make setup-tools` skips the version check; use x64 hosts or emulation for `make codeql`.
+On Linux or macOS **ARM64**, CodeQL from `mise.lock` is an x64 bundle. `make setup-tools` skips the version check; use x64 hosts or emulation for `make codeql`.
 

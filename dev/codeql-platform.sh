@@ -1,5 +1,6 @@
 # Shared CodeQL platform guard for mise toolchain scripts.
 # shellcheck shell=bash
+# shellcheck disable=SC2034  # Sourced; variables used by parent scripts.
 # CodeQL in mise.lock uses x64 bundles for linux-arm64 and macos-arm64; native
 # version checks and `make codeql` may not work on those hosts without emulation.
 codeql_os="$(uname -s)"
