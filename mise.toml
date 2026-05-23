@@ -57,7 +57,7 @@ tools.grype = "latest"
 run = "grype ."
 
 [tasks.scan-vulnerabilities]
-description = "Trivy, OSV-Scanner, and Grype scans (parallel)"
+description = "Trivy, OSV-Scanner, and Grype scans (parallel; OSV exits 1 when vulns are found)"
 run = [{ tasks = ["scan-trivy", "scan-osv", "scan-grype"] }]
 
 [tasks.codeql]

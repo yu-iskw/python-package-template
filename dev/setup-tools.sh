@@ -22,9 +22,9 @@ MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
 cd "${MODULE_DIR}"
 
 if ! command -v mise &>/dev/null; then
-	echo "Error: 'mise' is not on PATH."
-	echo "Install mise: https://mise.jdx.dev/getting-started.html"
-	echo "  curl https://mise.run/install.sh | sh"
+	echo "Error: 'mise' is not on PATH (required for make setup-tools and make setup)." >&2
+	echo "Install mise first: https://mise.jdx.dev/getting-started.html" >&2
+	echo "  Or use only Python setup: make setup-python" >&2
 	exit 1
 fi
 

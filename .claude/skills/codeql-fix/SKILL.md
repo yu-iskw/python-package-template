@@ -10,7 +10,7 @@ Use when the user asks to run CodeQL or static analysis, or to fix CodeQL findin
 
 ## Preconditions
 
-- [CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases) on `PATH` (e.g. `brew install codeql`).
+- [CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases) on `PATH` via **`make setup-tools`**, **`make codeql`** (`mise run codeql`), or **`mise install --locked`** per `mise.toml`.
 - Install project deps before creating the database (`uv sync`, `make setup`, or CI-style `uv sync --frozen`) so results match installed dependencies.
 
 ## Run analysis (repository root)

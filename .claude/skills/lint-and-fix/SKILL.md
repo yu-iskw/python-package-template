@@ -11,11 +11,11 @@ An autonomous loop for the agent to identify, fix, and verify linting and format
 
 ## Trunk CLI resolution
 
-Trunk must be executable for `make lint` / `make format` (they delegate to `mise run` tasks in `mise.toml`). Resolve the command **once** at the start of the loop:
+Trunk must be executable for `make lint` / `make format` (they call `trunk` directly). Resolve the command **once** at the start of the loop:
 
-1. If `trunk` is on `PATH` (`command -v trunk`), use `trunk` (normally via mise after `make setup-tools`).
+1. If `trunk` is on `PATH` (`command -v trunk`), use `trunk`.
 2. Otherwise use the NPM launcher package so behavior matches [Trunk install (NPM)](https://github.com/trunk-io/docs/blob/main/code-quality/overview/cli/getting-started/install.md): run Trunk via **`npx --yes @trunkio/launcher`** with the same subcommands and arguments you would pass to `trunk` (for example `npx --yes @trunkio/launcher check -a`, `npx --yes @trunkio/launcher fmt -a`, `npx --yes @trunkio/launcher install`).
-3. If Trunk reports missing managed tools, run **`trunk install`** (or the `npx … install` form above) per [AGENTS.md](../../../AGENTS.md).
+3. If Trunk reports missing managed tools, run **`mise run trunk-install`** or **`make setup-tools`** (or the `npx … install` form above) per [AGENTS.md](../../../AGENTS.md).
 
 When `trunk` is missing from `PATH`, prefer those explicit `npx --yes @trunkio/launcher …` invocations over `make lint` / `make format`, since the Makefile does not substitute the CLI name.
 

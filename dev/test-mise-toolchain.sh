@@ -30,13 +30,13 @@ assert "mise on PATH" command -v mise
 assert "mise trust" mise trust --yes "${MODULE_DIR}/mise.toml"
 assert "mise install --locked" mise install --locked
 
-assert "mise-exec.sh removed" test ! -e dev/mise-exec.sh
+assert "no dev/mise-exec.sh wrapper" test ! -e dev/mise-exec.sh
 assert "setup-tools.sh executable" test -x dev/setup-tools.sh
 
 assert "mise.toml defines lint task" grep -q '^\[tasks\.lint\]' mise.toml
 assert "mise.toml defines scan-vulnerabilities task" grep -q '^\[tasks\.scan-vulnerabilities\]' mise.toml
 
-assert "trunk via mise run trunk-install (dry)" mise exec trunk@ -- trunk --version
+assert "trunk via mise exec" mise exec trunk@ -- trunk --version
 assert "trivy via mise exec" mise exec trivy@ -- trivy --version
 assert "osv-scanner via mise exec" mise exec osv-scanner@ -- osv-scanner --version
 assert "grype via mise exec" mise exec grype@ -- grype version
@@ -50,6 +50,7 @@ assert "osv-scanner matches trunk.yaml (2.3.8)" grep -q '2.3.8' <<<"${OSV_VER}"
 
 assert "Makefile defines setup-tools" grep -q '^setup-tools:' Makefile
 assert "Makefile uses mise run lint" grep -q 'mise run lint' Makefile
+assert "Makefile has no MISE_EXEC" sh -c '! grep -q "^MISE_EXEC" Makefile'
 
 echo ""
 echo "=== results: ${PASS} passed, ${FAIL} failed ==="
