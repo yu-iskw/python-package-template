@@ -8,6 +8,8 @@
 minimum_release_age = "7d"
 lockfile = true
 
+# Disabled when Sigstore/TUF or GitHub attestations are unreachable (e.g. restricted CI).
+# Checksums in mise.lock still pin downloads; re-enable when your network supports verification.
 [settings.aqua]
 cosign = false
 slsa = false

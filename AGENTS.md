@@ -6,7 +6,8 @@ Authoritative shared instructions for humans and coding agents. How each product
 
 Python package template. Tooling:
 
-- **Package manager**: [uv](https://github.com/astral-sh/uv)
+- **Package manager**: [uv](https://github.com/astral-sh/uv) (via `requirements.setup.txt`, not mise)
+- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml`, `mise.lock`, `minimum_release_age = "7d"`)
 - **Build system**: [Hatchling](https://hatch.pypa.io/latest/)
 - **Linting/formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit, Semgrep; Ruff is the formatter; Black is not used)
 - **Testing**: [pytest](https://docs.pytest.org/)
@@ -46,8 +47,7 @@ make clean        # Clean build artifacts
 
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
-- **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; versions from mise)
-- **Local CodeQL**: `make codeql` (CodeQL CLI via mise)
+- **Dependencies**: OSV-Scanner and Trivy
 - Use `trunk check` before pushing
 
 ## AI guardrails & code quality

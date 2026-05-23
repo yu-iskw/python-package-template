@@ -1,6 +1,7 @@
 #!/bin/bash
-# Run a command with mise-managed tools on PATH when mise.toml is present.
-# Usage: dev/mise-exec.sh trunk check -a
+# Run a command with a single mise-managed tool on PATH (avoids loading the full mise.toml toolchain).
+# Usage: dev/mise-exec.sh <tool> [args...]
+# Example: dev/mise-exec.sh trunk check -a
 
 set -Eeuo pipefail
 
@@ -10,8 +11,15 @@ MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
 
 cd "${MODULE_DIR}"
 
+if [[ $# -lt 1 ]]; then
+	echo "Usage: mise-exec.sh <tool> [args...]" >&2
+	exit 1
+fi
+
 if command -v mise &>/dev/null && [[ -f "${MODULE_DIR}/mise.toml" ]]; then
-	exec mise exec -- "$@"
+	tool="$1"
+	shift
+	exec mise exec "${tool}@" -- "${tool}" "$@"
 fi
 
 exec "$@"
