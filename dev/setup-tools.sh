@@ -32,7 +32,7 @@ fi
 codeql_os="$(uname -s)"
 codeql_arch="$(uname -m)"
 codeql_run_version_check=true
-if [[ "${codeql_os}" == "Linux" && ("${codeql_arch}" == "aarch64" || "${codeql_arch}" == "arm64") ]]; then
+if [[ ${codeql_os} == "Linux" && (${codeql_arch} == "aarch64" || ${codeql_arch} == "arm64") ]]; then
 	codeql_run_version_check=false
 fi
 
@@ -54,7 +54,7 @@ mise exec trunk@ -- trunk --version
 mise exec trivy@ -- trivy --version
 mise exec osv-scanner@ -- osv-scanner --version
 mise exec grype@ -- grype version
-if [[ "${codeql_run_version_check}" == "true" ]]; then
+if [[ ${codeql_run_version_check} == "true" ]]; then
 	mise exec codeql@ -- codeql version
 else
 	echo "codeql: version check skipped on Linux ARM64 (mise.lock provides x64 bundle only)." >&2
