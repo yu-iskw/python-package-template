@@ -6,7 +6,8 @@ Authoritative shared instructions for humans and coding agents. How each product
 
 Python package template. Tooling:
 
-- **Package manager**: [uv](https://github.com/astral-sh/uv)
+- **Package manager**: [uv](https://github.com/astral-sh/uv) (via `requirements.setup.txt`, not mise)
+- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml`, `mise.lock`, `minimum_release_age = "7d"`)
 - **Build system**: [Hatchling](https://hatch.pypa.io/latest/)
 - **Linting/formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit, Semgrep; Ruff is the formatter; Black is not used)
 - **Testing**: [pytest](https://docs.pytest.org/)
@@ -15,9 +16,7 @@ Python package template. Tooling:
 ## Quick commands
 
 ```bash
-make setup-tools  # mise: trunk, trivy, osv-scanner, grype, codeql (+ trunk install)
-make setup        # setup-tools + Python venv (uv sync)
-make setup-python # Python venv only (skip CLI toolchain)
+make setup        # Install dependencies and set up environment
 make lint         # Run all linters via Trunk
 make lint-python  # Same as `make lint` (trunk check)
 make format       # Auto-format code via Trunk
