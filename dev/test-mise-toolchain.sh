@@ -22,13 +22,12 @@ assert() {
 	fi
 }
 
-codeql_version_check_supported() {
-	[[ "$(uname -s)" != "Linux" ]] && return 0
-	case "$(uname -m)" in
-	aarch64 | arm64) return 1 ;;
-	esac
-	return 0
-}
+codeql_os="$(uname -s)"
+codeql_arch="$(uname -m)"
+codeql_run_version_check=true
+if [[ "${codeql_os}" == "Linux" && ( "${codeql_arch}" == "aarch64" || "${codeql_arch}" == "arm64" ) ]]; then
+	codeql_run_version_check=false
+fi
 
 echo "=== mise toolchain smoke tests ==="
 
@@ -49,7 +48,7 @@ assert "trivy via mise exec" mise exec trivy@ -- trivy --version
 assert "osv-scanner via mise exec" mise exec osv-scanner@ -- osv-scanner --version
 assert "grype via mise exec" mise exec grype@ -- grype version
 
-if codeql_version_check_supported; then
+if [[ "${codeql_run_version_check}" == "true" ]]; then
 	assert "codeql via mise exec" mise exec codeql@ -- codeql version
 else
 	echo "SKIP: codeql version on Linux ARM64 (x64 bundle in mise.lock)"
