@@ -12,9 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+MISE_EXEC = ./dev/mise-exec.sh
+
+# Install CLI toolchain via mise (trunk, trivy, osv-scanner, grype, codeql)
+.PHONY: setup-tools
+setup-tools:
+	bash ./dev/setup-tools.sh
+
 # Set up an environment
 .PHONY: setup
-setup: setup-python
+setup: setup-tools setup-python
 
 # Set up the python environment.
 .PHONY: setup-python
@@ -30,12 +37,12 @@ upgrade-deps:
 # Check all the coding style.
 .PHONY: lint
 lint:
-	trunk check -a
+	$(MISE_EXEC) trunk check -a
 
 # Format source codes
 .PHONY: format
 format:
-	trunk fmt -a
+	$(MISE_EXEC) trunk fmt -a
 	uv run ssort .
 
 # Find unused code (Vulture; reads [tool.vulture] in pyproject.toml).
