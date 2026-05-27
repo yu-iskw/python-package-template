@@ -6,7 +6,8 @@ Authoritative shared instructions for humans and coding agents. How each product
 
 Python package template. Tooling:
 
-- **Package manager**: [uv](https://github.com/astral-sh/uv)
+- **Package manager**: [uv](https://github.com/astral-sh/uv) (via `requirements.setup.txt`, not mise)
+- **CLI toolchain**: [mise](https://mise.jdx.dev/) — Trunk, Trivy, OSV-Scanner, Grype, CodeQL (`mise.toml` [tasks], `mise.lock`, `minimum_release_age = "7d"`)
 - **Build system**: [Hatchling](https://hatch.pypa.io/latest/)
 - **Linting/formatting**: [Trunk](https://trunk.io/) (Ruff, Pyright, Pylint, Bandit, Semgrep; Ruff is the formatter; Black is not used)
 - **Testing**: [pytest](https://docs.pytest.org/)
@@ -15,10 +16,12 @@ Python package template. Tooling:
 ## Quick commands
 
 ```bash
-make setup        # Install dependencies and set up environment
-make lint         # Run all linters via Trunk
-make lint-python  # Same as `make lint` (trunk check)
-make format       # Auto-format code via Trunk
+make setup-tools  # mise: trunk, trivy, osv-scanner, grype, codeql (+ trunk install)
+make setup        # setup-tools + Python venv (uv sync)
+make setup-python # Python venv only (skip CLI toolchain)
+make lint         # mise run lint (Trunk check)
+make lint-python  # Same as `make lint`
+make format       # mise run format-trunk + uv ssort
 make dead-code    # Find unused code with Vulture (see pyproject [tool.vulture])
 make vulture      # Same as make dead-code
 make test         # Run pytest with coverage (pytest-cov); alias: `make coverage`
@@ -26,6 +29,12 @@ make codeql       # Run local CodeQL analysis
 make build        # Build the package
 make clean        # Clean build artifacts
 ```
+
+## Mise toolchain (local vs CI)
+
+- **Local / agents:** Install [mise](https://mise.jdx.dev/) on `PATH`, then `make setup-tools` or `make setup`. Commands use **`mise run <task>`** from `mise.toml`—there is **no** `dev/mise-exec.sh` or other shell wrapper to invoke mise.
+- **CI:** [`.github/workflows/mise_toolchain.yml`](.github/workflows/mise_toolchain.yml) runs `jdx/mise-action` and `dev/test-mise-toolchain.sh`. Lint in PRs still uses [Trunk Action](.github/workflows/trunk_check.yml); Python tests use [uv](.github/workflows/test.yml).
+- **`make setup-python`** works without mise (Python/uv only). **`make setup`** requires mise because it runs `setup-tools` first.
 
 ## Code style
 
@@ -46,7 +55,9 @@ make clean        # Clean build artifacts
 
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
-- **Dependencies**: OSV-Scanner and Trivy
+- **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; runs serially via mise; versions from mise)
+- **Local CodeQL**: `make codeql` (CodeQL CLI via mise); on **Linux or macOS ARM64**, `make setup-tools` skips the CodeQL version check (x64 bundle in `mise.lock`)
+- **`make scan-vulnerabilities`:** OSV-Scanner exits **1** when it reports vulnerabilities (expected); fix deps or document accepted risk.
 - Use `trunk check` before pushing
 
 ## AI guardrails & code quality
@@ -79,10 +90,16 @@ make clean        # Clean build artifacts
 
 ## Common gotchas
 
-- Run tools with `uv run …` in the project virtualenv
-- Trunk pins tool versions: avoid installing the same linters globally
-- Commit `uv.lock` (do not gitignore it)
-- If Trunk errors about a missing tool, run `trunk install`
+- **Do not** add shell wrappers (e.g. `mise-exec.sh`) to call mise; use `mise.toml` `[tasks]` and `mise run`.
+- After clone: run `mise trust`, then `mise install --locked` (or `make setup-tools` / `make setup`); workflows are `[tasks]` in `mise.toml` (`mise run lint`, `mise tasks`)
+- Refresh the toolchain lock with `mise lock` and commit `mise.lock` when bumping CLI tools
+- Keep mise scanner versions aligned with `.trunk/trunk.yaml` (Trivy, OSV-Scanner) when bumping either side
+- Run Python tools with `uv run …` in the project virtualenv
+- Trunk pins linter versions under `.trunk/`; `make setup-tools` runs `mise run trunk-install`
+- Commit `uv.lock` and `mise.lock` (do not gitignore them)
+- If `mise install --locked` fails locally, extra tools in `~/.config/mise/config.toml` may be missing from `mise.lock`; `make setup-tools` retries without `--locked`, or run `MISE_LOCKED=false mise install`
+
+- If Trunk errors about a missing managed linter, run `mise run trunk-install` (via `make setup-tools`)
 
 ## Parallel or multi-step work (Claude Code)
 

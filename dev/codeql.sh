@@ -15,15 +15,22 @@
 
 set -euo pipefail
 
+SCRIPT_FILE="$(readlink -f "$0")"
+SCRIPT_DIR="$(dirname "${SCRIPT_FILE}")"
+MODULE_DIR="$(dirname "${SCRIPT_DIR}")"
+
+cd "${MODULE_DIR}"
+
 # Directory for the CodeQL database
 DB_DIR=".codeql_db"
 # Results file
 RESULTS_SARIF="codeql-results.sarif"
 
-# Check if codeql is installed
+# Invoked via `mise run codeql`, which activates codeql from mise.toml.
 if ! command -v codeql &>/dev/null; then
 	echo "Error: 'codeql' command not found."
-	echo "Please install the CodeQL CLI. See: https://docs.github.com/en/code-security/codeql-cli"
+	echo "Run: make setup-tools  (mise installs codeql from mise.toml)"
+	echo "Or: https://docs.github.com/en/code-security/codeql-cli"
 	exit 1
 fi
 

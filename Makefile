@@ -12,9 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Install CLI toolchain via mise (trunk, trivy, osv-scanner, grype, codeql)
+.PHONY: setup-tools
+setup-tools:
+	bash ./dev/setup-tools.sh
+
 # Set up an environment
 .PHONY: setup
-setup: setup-python
+setup: setup-tools setup-python
 
 # Set up the python environment.
 .PHONY: setup-python
@@ -28,14 +33,16 @@ upgrade-deps:
 	uv sync --all-extras
 
 # Check all the coding style.
-.PHONY: lint
+.PHONY: lint lint-python
 lint:
-	trunk check -a
+	mise run lint
+
+lint-python: lint
 
 # Format source codes
 .PHONY: format
 format:
-	trunk fmt -a
+	mise run format-trunk
 	uv run ssort .
 
 # Find unused code (Vulture; reads [tool.vulture] in pyproject.toml).
@@ -51,7 +58,7 @@ test coverage:
 # Run local CodeQL analysis.
 .PHONY: codeql
 codeql:
-	bash ./dev/codeql.sh
+	mise run codeql
 
 # Build the package
 .PHONY: build
@@ -77,6 +84,4 @@ test-publish:
 
 .PHONY: scan-vulnerabilities
 scan-vulnerabilities:
-	trivy fs .
-	osv-scanner scan -r .
-	grype .
+	mise run scan-vulnerabilities

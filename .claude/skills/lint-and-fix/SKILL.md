@@ -11,22 +11,23 @@ An autonomous loop for the agent to identify, fix, and verify linting and format
 
 ## Trunk CLI resolution
 
-Trunk must be executable for `make lint` / `make format` (they call `trunk` directly). Resolve the command **once** at the start of the loop:
+`make lint` and `make format` delegate to **`mise run lint`** and **`mise run format-trunk`** (see `mise.toml`). Resolve Trunk **once** at the start of the loop:
 
-1. If `trunk` is on `PATH` (`command -v trunk`), use `trunk`.
-2. Otherwise use the NPM launcher package so behavior matches [Trunk install (NPM)](https://github.com/trunk-io/docs/blob/main/code-quality/overview/cli/getting-started/install.md): run Trunk via **`npx --yes @trunkio/launcher`** with the same subcommands and arguments you would pass to `trunk` (for example `npx --yes @trunkio/launcher check -a`, `npx --yes @trunkio/launcher fmt -a`, `npx --yes @trunkio/launcher install`).
-3. If Trunk reports missing managed tools, run **`trunk install`** (or the `npx … install` form above) per [AGENTS.md](../../../AGENTS.md).
+1. After **`make setup-tools`** (or `mise install --locked`), prefer **`make lint`** / **`make format`** so mise activates the pinned `trunk` from `mise.lock`.
+2. If `trunk` is on `PATH` (`command -v trunk`), you may also call `trunk check -a` / `trunk fmt -a` directly (same as `mise run lint` / `mise run format-trunk` when shims are active).
+3. Otherwise use the NPM launcher: **`npx --yes @trunkio/launcher`** with the same subcommands (for example `npx --yes @trunkio/launcher check -a`, `npx --yes @trunkio/launcher fmt -a`, `npx --yes @trunkio/launcher install`).
+4. If Trunk reports missing managed tools, run **`mise run trunk-install`** or **`make setup-tools`** (or the `npx … install` form above) per [AGENTS.md](../../../AGENTS.md).
 
-When `trunk` is missing from `PATH`, prefer those explicit `npx --yes @trunkio/launcher …` invocations over `make lint` / `make format`, since the Makefile does not substitute the CLI name.
+When `trunk` is missing from `PATH` and mise is not installed, prefer explicit **`npx --yes @trunkio/launcher …`** over `make lint` / `make format`.
 
 ## Loop Logic
 
 1. **Identify**:
-   - Run **`make lint`** (`trunk check -a`) **or**, when `trunk` is unavailable, **`npx --yes @trunkio/launcher check -a`**.
+   - Run **`make lint`** (**`mise run lint`**, Trunk `check -a`) **or**, when Trunk is unavailable, **`npx --yes @trunkio/launcher check -a`**.
    - Run **dead-code detection**: **`make dead-code`** (alias **`make vulture`**, runs **`uv run vulture`** using `[tool.vulture]` in `pyproject.toml`). Fix unused code the tool reports by removing it or wiring it into real usage—do not silence Vulture with broad excludes unless the user asked for that policy change.
 2. **Analyze**: Examine the output from Trunk and Vulture, focusing on the file path, line number, and error message.
 3. **Fix**:
-   - For formatting issues, run **`make format`** (`trunk fmt -a`) **or** **`npx --yes @trunkio/launcher fmt -a`** when using the NPM launcher.
+   - For formatting issues, run **`make format`** (**`mise run format-trunk`** plus `uv run ssort`) **or** **`npx --yes @trunkio/launcher fmt -a`** when using the NPM launcher.
    - For linting violations, apply the minimum necessary change to the source code to resolve the error.
    - Resolve findings by changing code, types, imports, or structure—not with suppressions (see **Constraints**).
 4. **Verify**:
@@ -62,7 +63,7 @@ When `trunk` is missing from `PATH`, prefer those explicit `npx --yes @trunkio/l
 ### Scenario: `trunk` not on PATH
 
 1. `make lint` fails with “trunk: command not found”.
-2. Agent runs `npx --yes @trunkio/launcher check -a` and continues the loop using `npx --yes @trunkio/launcher fmt -a` for formatting until checks pass.
+2. Agent runs `make setup-tools` or `npx --yes @trunkio/launcher check -a` and continues the loop using `npx --yes @trunkio/launcher fmt -a` for formatting until checks pass.
 
 ## Resources
 

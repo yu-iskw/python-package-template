@@ -5,16 +5,16 @@ description: Set up the development environment for the project. Use when starti
 
 # Setup Development Environment
 
-Ensure Python, `uv`, and `Trunk` match this template, then install dependencies.
+Ensure mise, Python, `uv`, and CLI tools match this template, then install dependencies.
 
 ## Workflow
 
-1. **Validate tooling** — Read `.python-version` in the repo root; the active interpreter should match. Ensure `uv` and `trunk` are on `PATH` (on macOS: `brew install trunk-io uv` if missing).
-2. **Install dependencies** — From the repo root, run `make setup` (see [CLAUDE.md](../../../CLAUDE.md) for `uv` / `make` conventions). This runs `dev/setup.sh`, which creates the venv and syncs dependencies.
-3. **Trunk artifacts** — Run `trunk install` so managed linters and formatters are present.
+1. **Validate tooling** — Read `.python-version` in the repo root; the active interpreter should match. Ensure [mise](https://mise.jdx.dev/) is on `PATH` (see [getting started](https://mise.jdx.dev/getting-started.html) if missing).
+2. **Install CLI toolchain** — From the repo root, run `make setup-tools` (or `mise trust` then `mise install --locked`). This installs trunk, trivy, osv-scanner, grype, and codeql from `mise.toml` / `mise.lock` and runs `mise run trunk-install`.
+3. **Install Python dependencies** — Run `make setup` (runs `setup-tools` then `setup-python`) or `make setup-python` alone if the toolchain is already present. `dev/setup.sh` installs `uv` from `requirements.setup.txt`, creates the venv, and syncs dependencies.
 4. **Optional verification** — Invoke the `verifier` subagent ([../../agents/verifier.md](../../agents/verifier.md)) if you need a full build, lint, and test pass after a broken or fresh environment.
 
 ## Success criteria
 
 - Dependencies install without errors into the project virtual environment.
-- `uv` and `trunk` are available; Python matches `.python-version`.
+- `mise run lint` or `mise exec trunk@ -- trunk --version` succeeds; Python matches `.python-version`; `uv` is available.

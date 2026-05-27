@@ -23,8 +23,13 @@ This template enforces high security and maintainability standards:
 Conventions, build commands, and AI-agent instructions: see [AGENTS.md](AGENTS.md). Claude Code–specific config lives in `CLAUDE.md` (it imports [AGENTS.md](AGENTS.md)) and in [`.claude/`](.claude/).
 
 ```bash
-make setup      # Install dependencies and set up environment
-make lint       # Run all linters via Trunk
-make format     # Auto-format code via Trunk
-make test       # Run pytest test suite
+make setup-tools  # mise install --locked + mise run trunk-install
+make setup        # setup-tools + Python venv (uv)
+make lint         # mise run lint (Trunk)
+make format       # mise run format-trunk + ssort
+make test         # Run pytest test suite
+make scan-vulnerabilities  # Trivy, OSV-Scanner, Grype (serial via mise)
+make codeql       # Local CodeQL (x64 or Rosetta on ARM64; see AGENTS.md)
 ```
+
+On Linux or macOS **ARM64**, CodeQL from `mise.lock` is an x64 bundle. `make setup-tools` skips the version check; use x64 hosts or emulation for `make codeql`.
