@@ -27,12 +27,12 @@ lint:
     - actionlint@1.7.12
     - markdown-link-check@3.14.2
     - pyright@1.1.410
-    - ruff@0.15.14:
+    - ruff@0.15.15:
         commands: [lint, format]
     - pylint@4.0.5
-    - semgrep@1.163.0
+    - semgrep@1.164.0
     - pre-commit-hooks@5.0.0
-    - trivy@0.70.0
+    - trivy@0.71.0
     - osv-scanner@2.3.8
     - bandit@1.9.4
     - shellcheck@0.11.0
