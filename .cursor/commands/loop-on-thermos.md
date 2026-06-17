@@ -1,33 +1,29 @@
 ---
-description: Loop thermos review and fix findings until clear at a severity threshold (default P0); optional P1/P2/P3 level argument; one commit per resolved issue.
+description: Loop thermos review and fix findings until clear at configurable severity levels (default P0, P1); one commit per resolved issue.
 ---
 
 # Loop on Thermos
 
-Iterate thermos review → triage → fix-and-commit → re-review until no actionable findings remain **at or above** the configured severity threshold.
+Address review feedback until there are no issues at the target severity levels.
 
-This is an **in-session agent loop** (like loop-on-ci), not the `/loop` skill’s background shell ticker. Continue in the same chat until the exit condition is met.
+This is an **in-session agent loop** (like loop-on-ci), not the `/loop` skill's background shell ticker. Continue in the same chat until the exit condition is met.
 
-## Usage
+## Target levels
 
-```text
-/loop-on-thermos              → threshold P0 (default)
-/loop-on-thermos P1           → threshold P1 (address P0 and P1)
-/loop-on-thermos P2           → threshold P2 (address P0, P1, P2)
-/loop-on-thermos P3           → threshold P0 through P3
-/loop-on-thermos --level P1   → same as bare P1
-```
+Read severity levels from text the user provides after `/loop-on-thermos`.
 
-**Threshold semantics (cumulative):** `level = Pn` means all findings with severity **P0 through Pn** are in scope for triage and fix. Findings **below** the threshold are labeled in the report but **do not block loop exit**.
+- **Default:** `P0`, `P1` when no levels are specified.
+- **Examples:** `/loop-on-thermos P0` · `/loop-on-thermos P0 P1 P2` · `/loop-on-thermos P1,P2`
+- **Parsing:** Accept space- or comma-separated tokens; normalize to uppercase (`P0`–`P3` or whatever `/thermos` emits). Reject invalid tokens and ask the user to retry.
+- **Priority order:** P0 → P1 → P2 → P3 (fix higher severity first).
+- **Out of scope:** Issues at levels not in the target list (e.g. if targets are `P0` only, ignore P1+).
 
-| Invocation       | In-scope for fix | Blocks exit                   | Reported only |
-| ---------------- | ---------------- | ----------------------------- | ------------- |
-| (default) / `P0` | P0               | P0 actionable remaining       | P1, P2, P3    |
-| `P1`             | P0, P1           | P0 or P1 actionable remaining | P2, P3        |
-| `P2`             | P0, P1, P2       | P0–P2 actionable remaining    | P3            |
-| `P3`             | P0–P3            | any actionable remaining      | —             |
-
-Invalid values (`P4`, `high`, etc.): show usage hint; abort unless the user confirms defaulting to P0.
+| Invocation                  | Target levels        |
+| --------------------------- | -------------------- |
+| `/loop-on-thermos`          | `P0`, `P1` (default) |
+| `/loop-on-thermos P0`       | `P0` only            |
+| `/loop-on-thermos P0 P1 P2` | `P0`, `P1`, `P2`     |
+| `/loop-on-thermos P1,P2`    | `P1`, `P2`           |
 
 ## Prerequisites
 
@@ -35,12 +31,14 @@ Invalid values (`P4`, `high`, etc.): show usage hint; abort unless the user conf
 - Clean working tree or explicit user consent to commit on the current branch.
 - Run `make lint && make test` before each commit (see [AGENTS.md](../../AGENTS.md)).
 
-## Workflow
+## Loop
+
+Repeat until the latest thermos review reports **zero issues at every target level**:
 
 ### 0. Initialize
 
-1. **Parse severity threshold** from the invocation (default `P0`).
-2. Record loop iteration count (start at 1). Echo the active threshold in the first status line.
+1. **Parse target levels** from the invocation (default `P0`, `P1`).
+2. Record loop iteration count (start at 1). Echo the active target levels in the first status line.
 3. Resolve review scope: `git merge-base HEAD main` (or user-provided base); collect `git diff` + changed file contents (same prep as Thermos README).
 4. If no diff vs base, stop with a short message.
 
@@ -54,64 +52,73 @@ Follow the **thermos** skill exactly:
 2. Synthesize deduplicated findings.
 3. **Normalize every finding to P0–P3**:
 
-| Level  | Thermo signals (examples)                                                                                         | Default loop (P0 threshold) | When threshold includes this level    |
-| ------ | ----------------------------------------------------------------------------------------------------------------- | --------------------------- | ------------------------------------- |
-| **P0** | Security vuln, data loss, breaking functionality/devex, feature-flag leak, high-confidence correctness bug        | Must fix or defer           | Must fix or defer                     |
-| **P1** | High-impact contract break, code-quality approval-bar blockers (1k-line sprawl, spaghetti growth, boundary leaks) | Report only                 | Must fix or defer                     |
-| **P2** | Moderate maintainability / edge-case issues                                                                       | Report only                 | Must fix or defer (if threshold ≥ P2) |
-| **P3** | Low-impact nits                                                                                                   | Report only                 | Must fix or defer (if threshold = P3) |
+| Level  | Thermo signals (examples)                                                                                         |
+| ------ | ----------------------------------------------------------------------------------------------------------------- |
+| **P0** | Security vuln, data loss, breaking functionality/devex, feature-flag leak, high-confidence correctness bug        |
+| **P1** | High-impact contract break, code-quality approval-bar blockers (1k-line sprawl, spaghetti growth, boundary leaks) |
+| **P2** | Moderate maintainability / edge-case issues                                                                       |
+| **P3** | Low-impact nits                                                                                                   |
 
 Each finding must include: `#`, severity, `file:line`, one-line title, evidence snippet, suggested fix (if known).
 
-Split findings into **in scope** (at or above threshold) and **below threshold** (informational).
+### 2. Triage
 
-### 2. Triage in-scope findings
+Extract only issues matching the **target levels**. Ignore all other levels unless the user explicitly expands scope mid-run.
 
-Filter to findings **at or above the active threshold**. Produce a **triage table** ordered by **severity first (P0 → Pn), then high impact / low fix risk**:
+Produce a **triage table** ordered by **severity first (P0 → P3 among targets), then high impact / low fix risk**:
 
-- **Quick wins:** localized, mechanical, high-confidence fixes (missing guard, wrong env var name, extract helper).
+- **Quick wins:** localized, mechanical, high-confidence fixes.
 - **Medium:** cross-file but still bounded refactors.
-- **Hard / risky:** architectural rewrites, ambiguous intent, or **intended breakage** (per thermo-nuclear-review “Intended Breakage Guidelines”).
+- **Hard / risky:** architectural rewrites, ambiguous intent, or **intended breakage** (per thermo-nuclear-review "Intended Breakage Guidelines").
 
-Present the ordered queue briefly; proceed unless the user redirects. Findings marked **intentional/accepted** or **invalid on re-check** move to “Deferred” and do not block exit once acknowledged.
+Present the ordered queue briefly; proceed unless the user redirects. Findings marked **intentional/accepted** or **invalid on re-check** move to "Deferred" and do not block exit once acknowledged.
 
-**Exit check:** if zero actionable in-scope findings remain → go to step 4.
+- If none remain at target levels → go to **Done**.
 
-### 3. Address issues one by one (serial)
+### 3. Fix one issue
 
-For **one** in-scope finding at a time (P0 before P1, etc.):
+For **one** target-level finding at a time (highest severity first among target levels: P0 before P1 before P2 before P3):
 
 1. Re-read cited `file:line`; skip if evidence no longer matches (note why).
 2. Implement the **smallest correct fix** for that finding only.
 3. Run `make lint && make test`.
-4. **Commit** one finding per commit (conventional commits):
+4. **Commit** — create **one git commit** for that fix. Do not batch unrelated issues:
 
    ```text
    fix(review): resolve thermos #N — <short title>
    ```
 
-5. Move to the next queued in-scope finding **without** re-running thermos mid-queue.
+5. Move to the next queued target-level finding **without** re-running thermos mid-queue.
 
-After the queue is empty for this iteration → increment iteration count and go to step 1 (fresh thermos on updated branch).
+After the queue is empty for this iteration → increment iteration count and return to step 1 (fresh thermos on updated branch).
 
-### 4. Exit and report
+## Commit rules
 
-When thermos reports **zero actionable findings at or above the threshold**:
+- Commit only when an issue is fully resolved.
+- Follow repo commit style (`type(scope): description` per CLAUDE.md).
+- Do not push unless the user asks.
+- Never use `--no-verify` or skip hooks.
+- If a pre-commit hook modifies files, fix and create a **new** commit (do not amend unless amend rules apply).
 
-- Summarize: active threshold, iterations run, commits made (SHAs + messages), deferred/skipped items, below-threshold backlog.
-- Do **not** auto-push unless the user asks.
+## Progress reporting
+
+After each iteration, briefly report:
+
+- Issue fixed (ID/title, severity)
+- Commit SHA and message
+- Remaining count per target level
 
 Use this output template each iteration:
 
 ```markdown
-## Loop-on-thermos — iteration N (threshold: P0)
+## Loop-on-thermos — iteration N (targets: P0, P1)
 
 ### Findings in scope
 
 | #   | Sev | File | Title | Triage |
 | --- | --- | ---- | ----- | ------ |
 
-### Below threshold (informational)
+### Outside target levels (informational)
 
 | #   | Sev | File | Title |
 | --- | --- | ---- | ----- |
@@ -123,16 +130,24 @@ Use this output template each iteration:
 
 ### Status
 
-- Threshold: P0
-- Actionable in-scope remaining: N
-- Below threshold (not blocking): N
+- Target levels: P0, P1
+- Remaining per level: P0=N, P1=N, …
+- Outside targets (not blocking): N
 - Next: <fix #X | re-run thermos | done>
 ```
+
+## Done
+
+When thermos reports no issues at any target level:
+
+- Summarize all commits made in the loop
+- List any remaining issues outside target levels (informational only)
+- Confirm the loop is complete
+- Do **not** auto-push unless the user asks.
 
 ## Guardrails
 
 - One finding per commit; no drive-by refactors.
-- Never use `--no-verify` or skip hooks.
-- Do not “fix” in-scope findings that are intentional scope — defer with rationale instead.
-- **Stuck handling:** after **5 full thermos cycles** with the same in-scope finding persisting, stop and ask the user (design decision, disputed finding, or needs human review).
+- Do not "fix" target-level findings that are intentional scope — defer with rationale instead.
+- **Stuck handling:** after **5 full thermos cycles** with the same target-level finding persisting, stop and ask the user.
 - **Max scope creep:** if a fix requires touching >3 files or a design change, pause triage and ask before proceeding.
