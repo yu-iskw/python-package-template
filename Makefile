@@ -85,3 +85,11 @@ test-publish:
 .PHONY: scan-vulnerabilities
 scan-vulnerabilities:
 	mise run scan-vulnerabilities
+
+# Generate CycloneDX SBOM and scan it with Trivy and Grype.
+.PHONY: sbom-check sbom-generate
+sbom-check:
+	mise run sbom-check
+
+sbom-generate:
+	mise run sbom-generate

@@ -38,6 +38,10 @@ assert "setup-tools.sh executable" test -x dev/setup-tools.sh
 
 assert "mise.toml defines lint task" grep -q '^\[tasks\.lint\]' mise.toml
 assert "mise.toml defines scan-vulnerabilities task" grep -q '^\[tasks\.scan-vulnerabilities\]' mise.toml
+assert "mise.toml defines sbom-generate task" grep -q '^\[tasks\.sbom-generate\]' mise.toml
+assert "mise.toml defines sbom-check task" grep -q '^\[tasks\.sbom-check\]' mise.toml
+assert "Makefile uses mise run sbom-check" grep -q 'mise run sbom-check' Makefile
+assert "normalize_cyclonedx_sbom.py exists" test -f dev/normalize_cyclonedx_sbom.py
 
 assert "trunk via mise exec" mise exec trunk@ -- trunk --version
 assert "trivy via mise exec" mise exec trivy@ -- trivy --version

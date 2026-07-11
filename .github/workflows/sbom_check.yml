@@ -1,0 +1,29 @@
+name: SBOM check
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  sbom-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+          cache: true
+
+      - name: Generate and scan CycloneDX SBOM
+        run: mise run sbom-check
+
+      - name: Upload SBOM artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: dist/sbom/sbom.cdx.json
+          if-no-files-found: warn

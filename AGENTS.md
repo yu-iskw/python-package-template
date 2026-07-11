@@ -25,6 +25,8 @@ make format       # mise run format-trunk + uv ssort
 make dead-code    # Find unused code with Vulture (see pyproject [tool.vulture])
 make vulture      # Same as make dead-code
 make test         # Run pytest with coverage (pytest-cov); alias: `make coverage`
+make scan-vulnerabilities  # Trivy, OSV-Scanner, Grype (serial via mise)
+make sbom-check   # Generate CycloneDX SBOM and scan with Trivy + Grype
 make codeql       # Run local CodeQL analysis
 make build        # Build the package
 make clean        # Clean build artifacts
@@ -56,6 +58,7 @@ make clean        # Clean build artifacts
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
 - **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; runs serially via mise; versions from mise)
+- **SBOM**: CycloneDX JSON via Trivy (`make sbom-check`); Trivy exits **1** on findings; Grype `--fail-on high` exits **2** on high/critical
 - **Local CodeQL**: `make codeql` (CodeQL CLI via mise); on **Linux or macOS ARM64**, `make setup-tools` skips the CodeQL version check (x64 bundle in `mise.lock`)
 - **`make scan-vulnerabilities`:** OSV-Scanner exits **1** when it reports vulnerabilities (expected); fix deps or document accepted risk.
 - Use `trunk check` before pushing
@@ -125,7 +128,7 @@ Slash-invoked skills live under [`.claude/skills/<name>/SKILL.md`](.claude/skill
 | `test-and-fix`              | Failing tests                                                               |
 | `setup-dev-env`             | First-time or broken environment                                            |
 | `python-upgrade`            | Dependency upgrades with uv                                                 |
-| `security-scan`             | Trivy / OSV / Grype (`make scan-vulnerabilities`)                           |
+| `security-scan`             | Trivy / OSV / Grype (`make scan-vulnerabilities`); SBOM (`make sbom-check`) |
 | `initialize-project`        | Renaming the template and bootstrapping                                     |
 | `manage-adr`                | ADRs in `docs/adr` (requires `adr` CLI)                                     |
 | `postmortem`                | Substantive session end; incidents; skip trivial chore-only sessions        |
