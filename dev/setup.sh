@@ -46,7 +46,7 @@ uv venv
 
 # Install package and dependencies
 if [[ ${deps} == "production" ]]; then
-	uv sync
+	uv sync --locked --no-dev
 else
-	uv sync --all-extras
+	uv sync --locked --all-groups --all-extras
 fi
