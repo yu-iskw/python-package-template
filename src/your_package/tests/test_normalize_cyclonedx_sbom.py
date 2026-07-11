@@ -21,7 +21,7 @@ import runpy
 from pathlib import Path
 from typing import Any
 
-import pytest
+import pytest  # pyright: ignore[reportMissingImports]
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 NORMALIZE_SCRIPT = REPO_ROOT / "dev" / "normalize_cyclonedx_sbom.py"
