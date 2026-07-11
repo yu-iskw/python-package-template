@@ -63,5 +63,36 @@ def test_normalize_cyclonedx_sbom_rejects_non_cyclonedx(tmp_path: Path) -> None:
     sbom_path = tmp_path / "not-sbom.json"
     sbom_path.write_text(json.dumps({"bomFormat": "SPDX"}), encoding="utf-8")
 
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit, match="bomFormat must be CycloneDX"):
         normalize_module["normalize_cyclonedx_sbom"](sbom_path)
+
+
+def test_normalize_cyclonedx_sbom_rejects_non_object(tmp_path: Path) -> None:
+    """Top-level JSON arrays must fail loudly."""
+    normalize_module = _load_normalize_module()
+    sbom_path = tmp_path / "array.json"
+    sbom_path.write_text("[]", encoding="utf-8")
+
+    with pytest.raises(SystemExit, match="expected a JSON object"):
+        normalize_module["normalize_cyclonedx_sbom"](sbom_path)
+
+
+def test_normalize_cyclonedx_sbom_skips_rewrite_when_already_16(
+    tmp_path: Path,
+) -> None:
+    """Already-normalized documents are left unchanged on disk."""
+    normalize_module = _load_normalize_module()
+    sbom_path = tmp_path / "sbom.cdx.json"
+    payload = {
+        "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
+        "bomFormat": "CycloneDX",
+        "specVersion": "1.6",
+        "version": 1,
+        "components": [],
+    }
+    sbom_path.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    before = sbom_path.read_bytes()
+
+    normalize_module["normalize_cyclonedx_sbom"](sbom_path)
+
+    assert sbom_path.read_bytes() == before

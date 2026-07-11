@@ -43,7 +43,7 @@ In some environments (restricted CI, air-gapped networks), Sigstore/TUF and GitH
 
 ## SBOM checks
 
-`mise run sbom-check` (also `make sbom-check`) generates a **CycloneDX JSON** SBOM with Trivy (`dist/sbom/sbom.cdx.json`, under gitignored `dist/`), normalizes it to **CycloneDX 1.6** via [`dev/normalize_cyclonedx_sbom.py`](../../dev/normalize_cyclonedx_sbom.py) (Trivy 0.71 emits 1.7; Grype 0.112 does not decode 1.7), then scans that SBOM with Trivy (`--exit-code 1` on findings; `TRIVY_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-db:2` for restricted egress) and Grype (`--fail-on high`). Scans run **serially**. CI runs the same task in [`.github/workflows/sbom_check.yml`](../../.github/workflows/sbom_check.yml) and uploads the SBOM artifact.
+`mise run sbom-check` (also `make sbom-check`) generates a **CycloneDX JSON** SBOM with Trivy (`dist/sbom/sbom.cdx.json`, under gitignored `dist/`), normalizes it to **CycloneDX 1.6** via [`dev/normalize_cyclonedx_sbom.py`](../../dev/normalize_cyclonedx_sbom.py) (Trivy 0.71 emits 1.7; Grype 0.112 does not decode 1.7), then scans that SBOM with Trivy (`--severity HIGH,CRITICAL --exit-code 1`; `TRIVY_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-db:2` for restricted egress) and Grype (`--fail-on high`). Scans run **serially**. CI runs the same task in [`.github/workflows/sbom_check.yml`](../../.github/workflows/sbom_check.yml) (installs only Trivy and Grype) and uploads the SBOM artifact.
 
 ## Global mise config and `--locked`
 

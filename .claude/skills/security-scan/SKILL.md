@@ -69,7 +69,7 @@ mise run sbom-scan-trivy
 mise run sbom-scan-grype
 ```
 
-Exit codes: Trivy SBOM scan uses `--exit-code 1` when vulns are found; Grype uses `--fail-on high` (exit **2** when high/critical findings exist).
+Exit codes: Trivy SBOM scan uses `--severity HIGH,CRITICAL --exit-code 1`; Grype uses `--fail-on high` (exit **2** when high/critical findings exist).
 
 ## Termination
 

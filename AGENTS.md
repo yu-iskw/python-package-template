@@ -58,7 +58,7 @@ make clean        # Clean build artifacts
 - **Static analysis**: Trunk runs Ruff, **Pyright** (types), Pylint, Bandit, Semgrep, and Trivy for quick feedback
 - **Deep analysis**: [GitHub CodeQL](https://codeql.github.com/) path analysis (see `.github/workflows/codeql.yml`)
 - **Dependencies**: OSV-Scanner, Trivy, and Grype (`make scan-vulnerabilities`; runs serially via mise; versions from mise)
-- **SBOM**: CycloneDX JSON via Trivy (`make sbom-check`); Trivy exits **1** on findings; Grype `--fail-on high` exits **2** on high/critical
+- **SBOM**: CycloneDX JSON via Trivy (`make sbom-check`); Trivy and Grype gate on **HIGH/CRITICAL** (Trivy `--exit-code 1`, Grype `--fail-on high`)
 - **Local CodeQL**: `make codeql` (CodeQL CLI via mise); on **Linux or macOS ARM64**, `make setup-tools` skips the CodeQL version check (x64 bundle in `mise.lock`)
 - **`make scan-vulnerabilities`:** OSV-Scanner exits **1** when it reports vulnerabilities (expected); fix deps or document accepted risk.
 - Use `trunk check` before pushing
