@@ -27,8 +27,8 @@ cd "${MODULE_DIR}" || exit
 # Arguments
 target=${1:?"target is not set"}
 
-# Ensure uv is installed
-pip install uv
+# Use the uv version installed by the calling workflow.
+uv --version
 
 # Build the package first
 uv build
