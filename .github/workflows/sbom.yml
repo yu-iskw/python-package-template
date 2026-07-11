@@ -31,14 +31,14 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: "3.13"
 
-      - name: Install pinned uv
+      - name: Install uv
         run: |
           python -m pip install \
             --disable-pip-version-check \
@@ -89,7 +89,7 @@ jobs:
           PY
 
       - name: Upload SBOM evidence
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: cyclonedx-sbom
           path: |
