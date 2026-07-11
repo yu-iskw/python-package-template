@@ -12,6 +12,7 @@ on:
       - dev/codeql-platform.sh
       - dev/test-mise-toolchain.sh
       - dev/codeql.sh
+      - dev/normalize_cyclonedx_sbom.py
   push:
     branches:
       - main
@@ -24,6 +25,7 @@ on:
       - dev/setup-tools.sh
       - dev/codeql-platform.sh
       - dev/test-mise-toolchain.sh
+      - dev/normalize_cyclonedx_sbom.py
 
 jobs:
   mise-toolchain:
