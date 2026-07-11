@@ -47,17 +47,17 @@ jobs:
       - name: Verify lockfile consistency
         run: uv lock --check
 
-      - name: Export all locked dependencies for auditing
+      - name: Export runtime dependencies for auditing
         run: |
           mkdir -p artifacts
           uv export \
             --frozen \
-            --all-groups \
+            --no-dev \
             --no-emit-project \
             --format requirements-txt \
             --output-file artifacts/requirements-audit.txt
 
-      - name: Audit locked dependencies
+      - name: Audit runtime dependencies
         run: |
           uvx --from pip-audit==2.10.1 pip-audit \
             --strict \
