@@ -23,6 +23,9 @@ jobs:
         run: mise install --locked trivy grype
 
       - name: Generate and scan CycloneDX SBOM
+        env:
+          # Keep this job SBOM-only: do not auto-install trunk/osv/codeql from [tools].
+          MISE_TASK_RUN_AUTO_INSTALL: "false"
         run: mise run sbom-check
 
       - name: Upload SBOM artifact
