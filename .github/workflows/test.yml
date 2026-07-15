@@ -5,9 +5,15 @@ on:
     paths:
       - .github/workflows/test.yml
       - pyproject.toml
-      - dbt_artifacts_parser/**/*.py
-      - tests/**/*.py
+      - src/your_package/**/*.py
       - pylintrc
+      - mise.toml
+      - mise.lock
+      - Makefile
+      - dev/**
+      - uv.lock
+      - .python-version
+      - requirements.setup.txt
   push:
     branches:
       - main
@@ -33,6 +39,9 @@ jobs:
       - name: Install dependencies
         run: |
           bash dev/setup.sh --deps "development"
+      - name: Vulture (dead code)
+        run: |
+          uv run vulture
       - name: Run tests
         run: |
           uv run bash dev/test_python.sh

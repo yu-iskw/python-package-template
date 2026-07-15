@@ -5,63 +5,16 @@ description: Set up the development environment for the project. Use when starti
 
 # Setup Development Environment
 
-This skill automates the process of setting up the development environment to ensure all tools and dependencies are correctly installed and configured.
+Ensure mise, Python, `uv`, and CLI tools match this template, then install dependencies.
 
-## Workflow Checklist
+## Workflow
 
-- [ ] **Step 1: Environment Validation**
-  - [ ] Check Python version against `.python-version`
-  - [ ] Check for `trunk` installation
-  - [ ] Check for `uv` installation
-- [ ] **Step 2: Dependency Installation**
-  - [ ] Run `make setup`
-- [ ] **Step 3: Tooling Setup**
-  - [ ] Run `trunk install` to fetch managed linters and formatters
+1. **Validate tooling** — Read `.python-version` in the repo root; the active interpreter should match. Ensure [mise](https://mise.jdx.dev/) is on `PATH` (see [getting started](https://mise.jdx.dev/getting-started.html) if missing).
+2. **Install CLI toolchain** — From the repo root, run `make setup-tools` (or `mise trust` then `mise install --locked`). This installs trunk, trivy, osv-scanner, grype, and codeql from `mise.toml` / `mise.lock` and runs `mise run trunk-install`.
+3. **Install Python dependencies** — Run `make setup` (runs `setup-tools` then `setup-python`) or `make setup-python` alone if the toolchain is already present. `dev/setup.sh` installs `uv` from `requirements.setup.txt`, creates the venv, and syncs dependencies.
+4. **Optional verification** — Invoke the `verifier` subagent ([../../agents/verifier.md](../../agents/verifier.md)) if you need a full build, lint, and test pass after a broken or fresh environment.
 
-## Detailed Instructions
+## Success criteria
 
-### 1. Environment Validation
-
-#### Python Version
-
-Read the `.python-version` file in the workspace root. Ensure the current Python environment matches this version. If there's a mismatch, inform the user to switch Python versions (e.g., using `pyenv` or `asdf`).
-
-#### Tooling Installation
-
-Check if `trunk` and `uv` are installed.
-If not found, advise the user to install them. On macOS, use:
-
-```bash
-brew install trunk-io uv
-```
-
-### 2. Dependency Installation
-
-Run the following command at the workspace root to install all project dependencies. Refer to [../common-references/python-commands.md](../common-references/python-commands.md) for more commands.
-
-```bash
-make setup
-```
-
-This command runs `dev/setup.sh`, which installs `uv` if needed (via pip), creates a virtual environment, and syncs dependencies.
-
-### 3. Tooling Setup
-
-Trunk manages linters and formatters hermetically. Run the following command to ensure all required tools are downloaded and ready.
-
-```bash
-trunk install
-```
-
-## Success Criteria
-
-- All Python dependencies are installed successfully in the virtual environment.
-- `trunk` and `uv` are installed.
-- The Python version matches the requirement in `.python-version`.
-
-## Post-Setup Verification
-
-To ensure the environment is fully operational:
-
-1. **Invoke Verifier**: Run the `verifier` subagent ([../../agents/verifier.md](../../agents/verifier.md)). This confirms that the freshly installed dependencies allow for a successful build, pass lint checks, and satisfy all unit tests.
-2. **Handle Failure**: If the `verifier` fails, follow its reporting to resolve environment-specific issues.
+- Dependencies install without errors into the project virtual environment.
+- `mise run lint` or `mise exec trunk@ -- trunk --version` succeeds; Python matches `.python-version`; `uv` is available.

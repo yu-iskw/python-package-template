@@ -19,7 +19,7 @@ Before making any changes, verify the current state of the project:
 
 ## 2. Upgrade Execution
 
-Choose the appropriate upgrade path based on the user's request. Refer to [../common-references/python-commands.md](../common-references/python-commands.md) for project-specific commands.
+Choose the appropriate upgrade path based on the user's request. For common `uv` and `make` usage, see the project root [CLAUDE.md](../../../CLAUDE.md).
 
 ### Targeted Upgrade (Recommended)
 

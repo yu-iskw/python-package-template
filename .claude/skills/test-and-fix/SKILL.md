@@ -11,7 +11,7 @@ An autonomous loop for the agent to identify, analyze, and fix failing unit test
 
 ## Loop Logic
 
-1. **Identify**: Run `make test` to identify failing tests.
+1. **Identify**: Run `make test` to identify failing tests (pytest with **pytest-cov**; terminal shows coverage summary).
 2. **Analyze**: Examine the `pytest` output to determine:
    - The failing test file and line number.
    - The expected vs actual values (assertion errors).
@@ -31,13 +31,12 @@ An autonomous loop for the agent to identify, analyze, and fix failing unit test
 
 ### Scenario: Fixing a logic error
 
-1. `make test` fails in `tests/test_math.py` because `add(2, 2)` returned `5`.
-2. Agent analyzes `src/your_package/math.py` and finds a typo `a + b + 1`.
-3. Agent fixes the typo to `a + b`.
+1. `make test` fails in `src/your_package/tests/test_dummy.py` due to an assertion or import error.
+2. Agent inspects the failing test and the implementation under `src/your_package/`.
+3. Agent applies the minimum fix in source or test so behavior matches the intended contract.
 4. `make test` passes.
 
 ## Resources
 
-- [Python Development Commands](../common-references/python-commands.md): Common commands for testing and managing dependencies.
 - [Pytest Documentation](https://docs.pytest.org/): Official documentation for the pytest framework.
-- [Unit Test Manners](../../../.cursor/rules/tech-stack.mdc): Project-specific testing guidelines.
+- Testing conventions for this repo: [AGENTS.md](../../../AGENTS.md) (Testing section).
