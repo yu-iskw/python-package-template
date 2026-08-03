@@ -6,7 +6,7 @@ on:
     # Runs every Wednesday (in the UTC timezone)
     - cron: 0 0 * * 3
 
-permissions: read-all
+permissions: {}
 
 jobs:
   trunk_upgrade:
@@ -17,7 +17,8 @@ jobs:
       pull-requests: write # For trunk to create PRs
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        # Trunk needs git credentials for PR base fetch / PR creation.
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0 # zizmor: ignore[artipacked]
       # >>> Install your own deps here (npm install, etc) <<<
       # SEE https://github.com/trunk-io/trunk-action
       - name: Trunk Upgrade
