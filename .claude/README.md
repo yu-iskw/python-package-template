@@ -1,37 +1,36 @@
-# Claude Code Configuration
+# Claude Code configuration
 
-This directory contains the Claude Code configuration for AI-assisted development.
+**Shared** project rules for all coding agents live in the repository root: **[`AGENTS.md`](../AGENTS.md)**. **[`CLAUDE.md`](../CLAUDE.md)** imports that file and then adds only **Claude Code–specific** context.
+
+This directory (`.claude/`) is read **by Claude Code** (and by Cursor for visibility into the same files). It does not replace [AGENTS.md](../AGENTS.md) as the single source of truth for stack, commands, and conventions.
 
 ## Structure
 
 ```text
 .claude/
-├── README.md              # This file
-├── settings.json          # Hooks, permissions, and environment
-├── agents/                # Specialized subagents
-│   ├── verifier.md       # Build/lint/test verification
-│   ├── code-reviewer.md  # Code quality and security review
-│   ├── parallel-executor.md      # Orchestrates parallel task execution
-│   ├── parallel-tasks-planner.md # Plans task decomposition
-│   └── task-worker.md    # Executes isolated subtasks
-├── skills/               # Reusable workflows and knowledge
-│   ├── build-and-fix/    # Auto-fix build errors
-│   ├── clean-project/    # Hard reset environment
-│   ├── common-references/ # Shared documentation
-│   ├── fix-issue/        # GitHub issue workflow
-│   ├── improve-claude-config/ # Self-improvement skill
-│   ├── initialize-project/ # Template bootstrapping
-│   ├── lint-and-fix/     # Auto-fix linting issues
-│   ├── parallel-executor/ # Invoke parallel execution workflow
-│   ├── pr-workflow/      # Pull request workflow
-│   ├── python-upgrade/   # Dependency upgrades
-│   ├── security-vulnerability-audit/ # Security scanning
-│   ├── setup-dev-env/    # Environment setup
-│   └── test-and-fix/     # Auto-fix failing tests
-└── hooks/                # Hook scripts
-    ├── block-dangerous.sh # Block dangerous commands
-    ├── format-python.sh   # Auto-format Python files
-    └── validate-commit.sh # Validate commit messages
+├── README.md                 # This file
+├── settings.json            # Hooks, permissions, and environment
+├── settings.local.json.example
+├── commands/                 # e.g. mend-adr
+├── agents/                    # Subagent definitions (Claude Code Task tool)
+│   └── verifier.md
+├── skills/                    # Slash-invoked skills (one SKILL.md per folder)
+│   ├── build-and-fix/
+│   ├── codeql-fix/
+│   ├── deep-problem-solving/
+│   ├── initialize-project/
+│   ├── lint-and-fix/
+│   ├── manage-adr/
+│   ├── postmortem/
+│   ├── problem-solving/
+│   ├── python-upgrade/
+│   ├── security-scan/
+│   ├── setup-dev-env/
+│   └── test-and-fix/
+└── hooks/
+    ├── block-dangerous.sh
+    ├── format-python.sh
+    └── validate-commit.sh
 ```
 
 ## Quick Start
@@ -40,73 +39,22 @@ This directory contains the Claude Code configuration for AI-assisted developmen
 
 Invoke skills with slash commands:
 
-```bash
-/setup-dev-env          # Set up your development environment
-/lint-and-fix           # Fix all linting issues
-/test-and-fix           # Fix failing tests
-/pr-workflow            # Create a pull request
-/fix-issue 123          # Fix GitHub issue #123
-/parallel-executor <task> # Execute complex tasks in parallel
+```text
+… typical examples (depends on which skills you keep under skills/)
+/setup-dev-env
+/lint-and-fix
+/test-and-fix
 ```
+
+See the skill name next to each folder in `skills/`; command names may match.
 
 ### Using Agents
 
 Agents are specialized assistants invoked via the Task tool:
 
-| Agent                      | Purpose                                     |
-| -------------------------- | ------------------------------------------- |
-| **verifier**               | Runs build → lint → test cycle              |
-| **code-reviewer**          | Reviews code for quality and security       |
-| **parallel-executor**      | Orchestrates parallel task execution        |
-| **parallel-tasks-planner** | Creates execution plans with file ownership |
-| **task-worker**            | Executes isolated subtasks with constraints |
-
-### Parallel Execution
-
-For large tasks that can benefit from concurrent work:
-
-```bash
-/parallel-executor Add comprehensive logging to all modules
-```
-
-**Architecture:**
-
-```text
-/parallel-executor "task description"
-        │
-        ▼
-┌───────────────────────┐
-│  parallel-executor    │  ← Orchestrator agent
-│       agent           │
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│ parallel-tasks-planner│  ← Creates execution plan
-│       agent           │
-└───────────┬───────────┘
-            │
-            ▼ (YAML plan with phases & file ownership)
-            │
-┌───────────┴───────────┐
-│   Phase Execution     │
-│                       │
-│  Phase 1 (Parallel):  │
-│  ┌─────┐  ┌─────┐    │
-│  │ W1  │  │ W2  │    │  ← task-worker agents
-│  └─────┘  └─────┘    │
-│                       │
-│  Phase 2 (Sequential):│
-│  ┌──────────────┐    │
-│  │     W3       │    │
-│  └──────────────┘    │
-└───────────┬───────────┘
-            │
-            ▼
-┌───────────────────────┐
-│   verifier agent      │  ← Verification
-└───────────────────────┘
-```
+| Agent        | Purpose                        |
+| ------------ | ------------------------------ |
+| **verifier** | Runs build → lint → test cycle |
 
 ### Self-Improvement
 
@@ -126,18 +74,14 @@ Contains:
 - **hooks**: Automatic triggers for tool events
 - **env**: Environment variables
 
-### CLAUDE.md (in project root)
+### AGENTS.md and CLAUDE.md (repository root)
 
-Project memory loaded at session start. Contains:
-
-- Quick commands reference
-- Code style conventions
-- Testing workflow
-- Common gotchas
+- [`AGENTS.md`](../AGENTS.md) — Single source of truth for stack, `make` targets, style, testing, security, git, and how every coding tool loads instructions
+- [`CLAUDE.md`](../CLAUDE.md) — Imports `AGENTS.md` and adds Claude Code–only material (this directory, self-improvement, hooks, skills)
 
 ## Best Practices
 
-1. **Keep CLAUDE.md concise**: Under 100 lines, move details to skills
+1. **Edit [`AGENTS.md`](../AGENTS.md) for shared rules**; keep `CLAUDE.md` lean (import + Claude-only)
 2. **Use specific skills**: Don't duplicate knowledge across skills
 3. **Test hooks**: Validate hook scripts work before committing
 4. **Version control**: Commit configuration changes with clear messages
@@ -165,8 +109,6 @@ Project memory loaded at session start. Contains:
 
 ## Resources
 
-- [Claude Code Documentation](https://code.claude.com/docs)
-- [Skills Guide](./skills/common-references/claude-code-guide.md)
-- [Parallel Execution Patterns](./skills/common-references/parallel-execution-patterns.md)
-- [Python Commands](./skills/common-references/python-commands.md)
-- [Trunk Commands](./skills/common-references/trunk-commands.md)
+- [Claude Code documentation](https://code.claude.com/docs)
+- [AGENTS.md](../AGENTS.md) — project instructions (all agents)
+- [CLAUDE.md](../CLAUDE.md) — Claude Code layer (imports AGENTS)

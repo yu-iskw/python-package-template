@@ -12,39 +12,53 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Install CLI toolchain via mise (trunk, trivy, osv-scanner, grype, codeql)
+.PHONY: setup-tools
+setup-tools:
+	bash ./dev/setup-tools.sh
+
 # Set up an environment
 .PHONY: setup
-setup: setup-python
+setup: setup-tools setup-python
 
 # Set up the python environment.
 .PHONY: setup-python
 setup-python:
 	bash ./dev/setup.sh --deps "development"
 
+# Upgrade Python dependencies (refresh uv.lock, then sync like development setup).
+.PHONY: upgrade-deps
+upgrade-deps:
+	uv lock --upgrade
+	uv sync --all-extras
+
 # Check all the coding style.
-.PHONY: lint
+.PHONY: lint lint-python
 lint:
-	trunk check -a
+	mise run lint
 
-# Check the coding style for the shell scripts.
-.PHONY: lint-shell
-lint-shell:
-	shellcheck ./dev/*.sh
-
-# Check the coding style for the python files.
-.PHONY: lint-python
-lint-python:
-	bash ./dev/lint_python.sh
+lint-python: lint
 
 # Format source codes
 .PHONY: format
 format:
-	trunk fmt -a
+	mise run format-trunk
+	uv run ssort .
 
-# Run the unit tests.
-.PHONY: test
-test:
+# Find unused code (Vulture; reads [tool.vulture] in pyproject.toml).
+.PHONY: dead-code vulture
+dead-code vulture:
+	uv run vulture
+
+# Run unit tests with coverage (pytest-cov / coverage.py).
+.PHONY: test coverage
+test coverage:
 	bash ./dev/test_python.sh
+
+# Run local CodeQL analysis.
+.PHONY: codeql
+codeql:
+	mise run codeql
 
 # Build the package
 .PHONY: build
@@ -67,3 +81,12 @@ publish:
 .PHONY: test-publish
 test-publish:
 	bash ./dev/publish.sh "testpypi"
+
+.PHONY: scan-vulnerabilities
+scan-vulnerabilities:
+	mise run scan-vulnerabilities
+
+# Generate CycloneDX SBOM and scan it with Trivy and Grype.
+.PHONY: sbom-check
+sbom-check:
+	mise run sbom-check

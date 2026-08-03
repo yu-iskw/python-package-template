@@ -10,6 +10,6 @@ export VISUAL=true
 if CREATED_FILE=$(adr new "$@"); then
 	echo "${CREATED_FILE}"
 else
-	echo "Error: Failed to create ADR." >&2
+	echo "Error: Failed to create ADR. Is 'adr-tools' installed?" >&2
 	exit 1
 fi

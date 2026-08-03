@@ -18,7 +18,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - name: Set up Python
@@ -51,7 +51,7 @@ jobs:
       PYTHON_PACKAGE_NAME: YOUR_PYTHON_PACKAGE_NAME
       PYTHON_NAME_SPACE: YOUR_PYTHON_NAME_SPACE
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - name: Set up Python
@@ -74,4 +74,4 @@ jobs:
           sleep 30
       - name: Test package
         run: |
-          python -c 'python -m ${PYTHON_NAME_SPACE}'
+          python -c "import ${PYTHON_NAME_SPACE}"
