@@ -29,6 +29,7 @@ make lint         # mise run lint (Trunk)
 make format       # mise run format-trunk + ssort
 make test         # Run pytest test suite
 make scan-vulnerabilities  # Trivy, OSV-Scanner, Grype (serial via mise)
+make sbom-check   # CycloneDX SBOM generate + Trivy/Grype scan
 make codeql       # Local CodeQL (x64 or Rosetta on ARM64; see AGENTS.md)
 ```
 

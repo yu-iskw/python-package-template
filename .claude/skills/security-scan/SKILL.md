@@ -1,6 +1,6 @@
 ---
 name: security-scan
-description: Scan the repository for vulnerable dependencies and known CVEs using Trivy, OSV-Scanner, and Grype via the Makefile. Use when the user asks to scan for vulnerabilities, check dependencies for CVEs, run OSV/Trivy/Grype, or run make scan-vulnerabilities.
+description: Scan the repository for vulnerable dependencies and known CVEs using Trivy, OSV-Scanner, and Grype via the Makefile. Use when the user asks to scan for vulnerabilities, check dependencies for CVEs, run OSV/Trivy/Grype, generate or check an SBOM, or run make scan-vulnerabilities / make sbom-check.
 compatibility: Requires `trivy`, `osv-scanner`, and `grype` on PATH (prefer `make setup-tools` or `mise install --locked` per `mise.toml`). Run from the repository root after `make setup` or `uv sync` so lockfiles and manifests match what you ship.
 ---
 
@@ -50,6 +50,26 @@ mise run scan-grype
 2. **Triage:** Separate **direct** dependencies you control from transitive ones; confirm whether findings are reachable in your use case when deciding urgency.
 3. **Fix:** Prefer upgrading or replacing packages (`uv lock`, version pins in `pyproject.toml`). Avoid silencing scanners in the template unless the user explicitly wants policy exceptions documented.
 4. **Verify:** Run `make scan-vulnerabilities` again; exit 0 only when there are no reported issues (or document accepted risk).
+
+## SBOM check
+
+Generate a CycloneDX JSON SBOM from the project (Trivy) and scan it for vulnerabilities (Trivy + Grype):
+
+```bash
+make sbom-check
+```
+
+Equivalent: `mise run sbom-check`. Output path: `dist/sbom/sbom.cdx.json` (gitignored under `dist/`).
+
+Individual tasks:
+
+```bash
+mise run sbom-generate
+mise run sbom-scan-trivy
+mise run sbom-scan-grype
+```
+
+Exit codes: Trivy SBOM scan uses `--severity HIGH,CRITICAL --exit-code 1`; Grype uses `--fail-on high` (exit **2** when high/critical findings exist).
 
 ## Termination
 

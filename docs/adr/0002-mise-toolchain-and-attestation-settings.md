@@ -41,6 +41,10 @@ In some environments (restricted CI, air-gapped networks), Sigstore/TUF and GitH
 
 `mise run scan-vulnerabilities` runs Trivy, OSV-Scanner, and Grype **serially** to avoid cache/DB contention. OSV-Scanner exits **1** when vulnerabilities are reported (expected gate).
 
+## SBOM checks
+
+`mise run sbom-check` (also `make sbom-check`) generates a **CycloneDX JSON** SBOM with Trivy (`dist/sbom/sbom.cdx.json`, under gitignored `dist/`), normalizes it to **CycloneDX 1.6** via [`dev/normalize_cyclonedx_sbom.py`](../../dev/normalize_cyclonedx_sbom.py) (Trivy 0.71 emits 1.7; Grype 0.112 does not decode 1.7), then scans that SBOM with Trivy (`--severity HIGH,CRITICAL --exit-code 1`; `TRIVY_DB_REPOSITORY=ghcr.io/aquasecurity/trivy-db:2` for restricted egress) and Grype (`--fail-on high`). Scans run **serially**. CI runs the same task in [`.github/workflows/sbom_check.yml`](../../.github/workflows/sbom_check.yml) (installs only Trivy and Grype; `MISE_TASK_RUN_AUTO_INSTALL=false` so `mise run` does not pull other `[tools]`) and uploads the SBOM artifact.
+
 ## Global mise config and `--locked`
 
 `make setup-tools` tries `mise install --locked` first, then falls back to `MISE_LOCKED=false mise install` when strict locked mode fails (for example global tools in `~/.config/mise/config.toml` that are not listed in this repo's `mise.lock`). CI smoke tests still require `mise install --locked` on a clean runner.
