@@ -21,8 +21,8 @@ github_attestations = false
 # Installed by `mise install --locked`; tasks use per-task `tools` for scoped activation.
 [tools]
 trunk = "latest"
-trivy = "0.71.1"
-"osv-scanner" = "latest"
+trivy = "0.73.0"
+"osv-scanner" = "2.5.0"
 grype = "latest"
 codeql = "latest"
 
@@ -63,7 +63,7 @@ run = "mise run scan-trivy && mise run scan-osv && mise run scan-grype"
 [tasks.sbom-generate]
 description = "Generate CycloneDX JSON SBOM (runtime/production deps from lockfiles)"
 tools.trivy = "latest"
-# Trivy 0.71 emits CycloneDX 1.7; Grype 0.112 (Syft) recognizes up to 1.6.
+# Trivy emits CycloneDX 1.7; Grype 0.112 (Syft) recognizes up to 1.6.
 run = """
 mkdir -p dist/sbom
 trivy fs --format cyclonedx --output dist/sbom/sbom.cdx.json .
