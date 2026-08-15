@@ -1,12 +1,6 @@
-name: SBOM and dependency audit
+name: Dependency audit and SBOM
 
 on:
-  pull_request:
-    paths:
-      - .github/workflows/sbom.yml
-      - pyproject.toml
-      - uv.lock
-      - requirements.setup.txt
   push:
     branches:
       - main
@@ -15,18 +9,20 @@ on:
       - pyproject.toml
       - uv.lock
       - requirements.setup.txt
+  schedule:
+    - cron: "31 2 * * 1"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: sbom-${{ github.workflow }}-${{ github.ref }}
+  group: dependency-audit-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   audit-and-generate:
-    name: Audit and generate SBOM
+    name: Audit dependencies and generate SBOM
     runs-on: ubuntu-latest
 
     steps:

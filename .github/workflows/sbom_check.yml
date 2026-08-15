@@ -1,10 +1,10 @@
-name: SBOM check
+name: SBOM toolchain check
 
+# This workflow validates the mise/Trivy/Grype SBOM toolchain itself. The
+# dependency audit workflow is the automatic security gate; avoid generating
+# and scanning a second SBOM on every pull request and main push.
 on:
-  pull_request:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
