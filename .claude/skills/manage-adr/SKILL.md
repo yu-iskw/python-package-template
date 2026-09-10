@@ -1,128 +1,113 @@
 ---
 name: manage-adr
-description: Manage Architecture Decision Records (ADRs). Use this to initialize, create, list, and link ADRs to document architectural evolution. Requires 'adr-tools' to be installed.
+description: Manage Architecture Decision Records (ADRs) with follow / challenge / accept. Use when initializing, creating, listing, linking, proposing supersession, or accepting/rejecting ADRs. Requires adr-tools.
 ---
 
 # Manage Architecture Decision Records (ADRs)
 
-Architecture Decision Records (ADRs) are a lightweight way to document the "why" behind significant technical choices.
+ADRs are durable architecture memory for coding agents. **Accepted** ADRs bind implementation. Better approaches use **Challenge** (Proposed supersession), not silent rewrites or `adr new -s` at proposal time.
 
-## Decision Significance Criteria
+Script path (all commands below): `.claude/skills/manage-adr/scripts/create-adr.sh`
 
-Use ADRs for decisions that meet one or more of the following criteria:
+## When to Use
 
-- **Architectural Impact**: Changes the fundamental structure or flow of the system.
-- **Cross-module or cross-cutting**: Decisions that affect multiple subsystems or shared libraries.
-- **Strategic Direction**: Significant choices that set a precedent for future development.
-- **Non-Obvious Trade-offs**: Choosing between multiple valid approaches where the choice isn't purely technical or has long-term implications.
+- Significant architectural change or choosing among approaches.
+- Standardizing a pattern across the codebase.
+- Understanding previous design decisions (`adr list` / index).
+- Challenging an Accepted ADR when Context is stale.
 
-Do **NOT** use ADRs for:
+Status meanings and the Nygard re-litigation rule: `references/adr-concepts.md`.
 
-- **Implementation Specifications**: Detailed API schemas, specific function signatures, or local implementation details (use design docs, README, or code instead).
-- **Bug Fixes**: Unless the fix requires a significant architectural change.
-- **Routine Changes**: Minor refactorings or style updates.
+## Modes: follow / challenge / accept
 
-## ADR (Why) vs. Design Docs / Code (How)
+### Follow (default feature work)
 
-A clear distinction must be maintained:
+1. If the task touches architecture, run `adr list` or read `docs/adr/README.md` (if present).
+2. Load **Accepted** ADR bodies that match the task. Do not load the whole tree or superseded bodies unless researching history.
+3. Implement against those Accepted decisions.
 
-- **ADR**: Focuses on the **Why**. It documents the decision, the context, the alternatives considered, and the high-level architecture. It is the source of truth for architectural evolution.
-- **Design docs, README, and code**: Focus on the **How**. Detailed proposal, technical specifications, design, and implementation tasks live in design docs, package READMEs, or code comments.
+### Challenge (better approach with evidence)
 
-When an ADR requires implementation, link to design docs or relevant code in the `References` section.
+Triggers (any one):
 
-## Content boundaries (required)
+- User asked for a different approach.
+- New requirement absent from the old Context.
+- Measured failure (tests, ops, security).
+- Constraints in the old Context no longer exist.
 
-### Include in the ADR
+Steps:
 
-- Context, **alternatives considered**, Decision, Consequences, **trade-offs**
-- **Stable invariants** (rules that should survive refactors)
-- Links to related ADRs
+1. **Stop** implementing the old decision. Do **not** edit its Decision section.
+2. Create a Proposed ADR (do **not** use `adr new -s`). `--proposes` targets must be **Accepted** (validated before `adr new`):
 
-### Keep out of the ADR
+```bash
+.claude/skills/manage-adr/scripts/create-adr.sh --proposes <old-adr-number> "New Decision Title"
+# or without a supersede target:
+.claude/skills/manage-adr/scripts/create-adr.sh "New Decision Title"
+```
 
-Put these in `pyproject.toml`, Ruff/Pyright config, tests, or package README instead:
+3. Fill Context (why the old Context is wrong), Decision, and Consequences.
+4. Leave Status **Proposed**. Open or update a **draft PR** and wait for human Accept.
 
-- Long file path lists and “directory listing” decisions
-- Duplicated **threshold tables** from Ruff, Pyright, pytest, or coverage tools (link to the living config instead)
-- Exhaustive filename or public-API inventories that belong in reference docs
+### Accept (human gate only)
 
-### Pointers
+Only when the user (or review) explicitly accepts the proposal:
 
-- At most **one coarse pointer per concern** (package or subsystem), e.g. “error handling in `your_package.api`”—not five relative paths.
+```bash
+.claude/skills/manage-adr/scripts/create-adr.sh accept <adr-number-or-file>
+```
 
-Granularity and anti-patterns: [references/adr-granularity.md](references/adr-granularity.md).
+Transactional Accept: re-checks propose targets are still Accepted, applies Supercedes via `adr link` + `_adr_remove_status` (adr-tools spelling), then sets Status Accepted and strips Status-only `<!-- adr-proposes:… -->` markers. On link failure, restores backups. Refreshes the existing TOC path (`README.md` or `index.md`) atomically.
 
-## Anti-patterns (do not)
+Regression harness: `.claude/skills/manage-adr/scripts/test-create-adr.sh`.
 
-- A Decision section that reads like a **folder tree** or file manifest
-- An Amendment whose only purpose is to **update paths** after a move (intent unchanged)
-- Mermaid diagrams that mirror **repository layout** instead of concepts, boundaries, or data flow—unless the ADR is literally about repository layout
+If a gotcha in root agent instructions encoded the old decision, update that copy in the **same change**.
 
-## Relationship to `mend-adr`
+### Reject
 
-- **`manage-adr`**: authoring and lifecycle (create, supersede, link, organize).
-- **`mend-adr`**: drift workflow when behavior may no longer match an Accepted ADR—short, decision-level updates; keep volatile detail in code and config.
+```bash
+.claude/skills/manage-adr/scripts/create-adr.sh reject <adr-number-or-file>
+```
 
-Command reference: [`.claude/commands/mend-adr.md`](../../../.claude/commands/mend-adr.md).
+Sets Status to Rejected. Old Accepted records stay Accepted.
 
-## Instructions
-
-### 1. Initialization
-
-If ADRs are not yet initialized in the project, run:
+## Initialization
 
 ```bash
 adr init docs/adr
 ```
 
-This ensures records are created in `docs/adr`.
-
-### 2. Creating a New ADR
-
-To create a new ADR, use the provided script to ensure non-interactive creation:
+## Creating a new ADR (Proposed)
 
 ```bash
 .claude/skills/manage-adr/scripts/create-adr.sh "Title of the ADR"
 ```
 
-After creation, the script will output the filename. You **MUST** then edit the file to fill in the Context, Decision, and Consequences.
+The script runs `adr new` then rewrites Status from Accepted → **Proposed** (adr-tools always substitutes Accepted). Then edit Context, Decision, and Consequences.
 
-### 3. Superseding an ADR
+**Never** pass `-s` / `--supercedes` to create a challenge. That immediately unbinds the old ADR.
 
-If a new decision replaces an old one, use the `-s` flag:
-
-```bash
-.claude/skills/manage-adr/scripts/create-adr.sh -s <old-adr-number> "New Decision Title"
-```
-
-### 4. Linking ADRs
-
-To link two existing ADRs (e.g., ADR 12 amends ADR 10):
+## Linking (non-supersession)
 
 ```bash
 adr link 12 Amends 10 "Amended by"
 ```
 
-### 5. Listing and Viewing
+## Listing and viewing
 
-- List all ADRs: `adr list`
-- Read a specific ADR: `read_file docs/adr/NNNN-title.md`
+- List: `adr list`
+- Index: `docs/adr/README.md` when present
+- Read one: `docs/adr/NNNN-title.md`
 
-### 6. Generating Reports
+## Reports
 
-- Generate a Table of Contents: `adr generate toc`
-- Generate a dependency graph (requires Graphviz): `adr generate graph | dot -Tpng -o adr-graph.png`
+- TOC: `adr generate toc`
+- Graph: `adr generate graph | dot -Tpng -o adr-graph.png` (requires Graphviz)
 
-### 7. Mermaid diagrams
+## Best Practices
 
-Prefer **conceptual** diagrams (data flow, trust boundaries, user-visible behavior) over file-tree diagrams unless the ADR is about layout. Put diagrams in the Decision (or Architecture) section using a `mermaid` fenced block; add one short sentence of context before the block.
-
-Examples and diagram types: [references/mermaid-diagrams.md](references/mermaid-diagrams.md).
-
-## Best practices
-
-- One decision per ADR; write for maintainers who lack your current context.
-- Always include **alternatives considered** and **trade-offs**; focus rationale (**why**) not implementation dumps (**how**).
-- Update status and links when decisions change.
-- Philosophy and links: [references/adr-concepts.md](references/adr-concepts.md). New record shape: [`docs/adr/template.md`](../../../docs/adr/template.md).
+- One decision per ADR. Write for future maintainers.
+- Do not copy ADR bodies into always-on `AGENTS.md` / `CLAUDE.md`. Point to the index instead.
+- Do not `@import` `docs/adr/**` into Claude memory files (token cost; expands at launch).
+- Refer to `references/adr-concepts.md` and `assets/template.md`.
+- Optional Mermaid diagrams for the decision or system shape.

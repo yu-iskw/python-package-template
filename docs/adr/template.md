@@ -1,3 +1,9 @@
+<!--
+Prose / human template. adr-tools may use docs/adr/templates/template.md with
+NUMBER/TITLE/DATE/STATUS tokens. create-adr.sh supports both Status forms:
+  ## Status + body line, and - **Status:** …
+-->
+
 # ADR NNNN: [Short title of solved problem and solution]
 
 - **Status:** [Proposed | Accepted | Deprecated | Superseded by ADR-NNNN]
