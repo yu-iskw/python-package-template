@@ -25,16 +25,6 @@ assert_eq() {
 	fi
 }
 
-assert_contains() {
-	local name="$1" needle="$2" hay="$3"
-	if [[ ${hay} == *"${needle}"* ]]; then
-		echo "ok - ${name}"
-	else
-		echo "not ok - ${name}: missing $(printf %q "${needle}")" >&2
-		FAILS=$((FAILS + 1))
-	fi
-}
-
 assert_file_contains() {
 	local name="$1" needle="$2" file="$3"
 	if grep -qF -- "${needle}" "${file}"; then
@@ -308,9 +298,12 @@ out="$("${CREATE_ADR}" --proposes 2 "Challenge Bullet")"
 assert_file_contains "bullet target marker" "<!-- adr-proposes:0002-bullet-status.md -->" "${out}"
 
 # 5) invalid propose (non-Accepted) before adr new — no orphan
-before="$(ls docs/adr/[0-9]*.md | wc -l | tr -d ' ')"
+count_adr_files() {
+	find docs/adr -maxdepth 1 -type f -name '[0-9]*.md' | wc -l | tr -d ' '
+}
+before="$(count_adr_files)"
 assert_exit "reject propose non-Accepted" 1 "${CREATE_ADR}" --proposes 3 "Should Fail"
-after="$(ls docs/adr/[0-9]*.md | wc -l | tr -d ' ')"
+after="$(count_adr_files)"
 assert_eq "no orphan after bad proposes" "${before}" "${after}"
 
 # 6) reject
