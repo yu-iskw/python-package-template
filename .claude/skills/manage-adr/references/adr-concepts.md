@@ -1,21 +1,53 @@
-# ADR concepts (this repository)
+# Architecture Decision Records (ADRs)
 
-Architecture Decision Records document **why** a significant choice was made, not a
-mirror of implementation files.
+An Architecture Decision Record (ADR) is a short text file that captures an important architectural decision made along with its context and consequences.
 
-## Canonical in-repo entry
+## Why use ADRs?
 
-- [ADR 0001 — Record architecture decisions](../../../../docs/adr/0001-record-architecture-decisions.md) — adopts ADRs for this project.
+- **Historical Context**: Understand _why_ a decision was made months or years later.
+- **Onboarding**: Help new team members understand the architectural evolution.
+- **Alignment**: Ensure everyone is on the same page regarding technical choices.
+- **Steerable memory**: Keep Accepted decisions binding for agents, while still allowing a better approach via Proposed supersession when Context changes.
 
-## External background
+## ADR Structure (Nygard Format)
 
-- [Documenting architecture decisions (Michael Nygard)](http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions)
-- [adr-tools](https://github.com/npryce/adr-tools) — CLI for numbering, linking, and TOC
+1. **Title**: Number and short noun phrase (e.g., "1. Record architecture decisions").
+2. **Status**: Proposed, Accepted, Superseded, Deprecated, or Rejected.
+3. **Context**: The situation and the problem being solved.
+4. **Decision**: The chosen solution.
+5. **Consequences**: The results of the decision (good and bad).
 
-## Local policy
+## Status meanings (for coding agents)
 
-Decision-first authoring and drift handling are defined in:
+| Status         | Meaning                                                                                                      |
+| -------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Proposed**   | Under discussion. Not binding. Do not implement unless the user explicitly asked to change architecture now. |
+| **Accepted**   | Binding for implementation.                                                                                  |
+| **Superseded** | History. Replaced by a later ADR. Do not treat as a constraint.                                              |
+| **Deprecated** | History. No longer applies; no replacement.                                                                  |
+| **Rejected**   | History. Do not revive without new evidence.                                                                 |
 
-- [`.claude/skills/manage-adr/SKILL.md`](../SKILL.md) — what belongs in an ADR
-- [`references/adr-granularity.md`](adr-granularity.md) — examples and heuristics
-- [`.claude/commands/mend-adr.md`](../../../commands/mend-adr.md) — intent-first drift checks
+## Re-litigation rule (Nygard)
+
+Do **not** re-litigate an Accepted decision **without new Context**.
+
+Do **reopen** a decision when Context changed: open a new ADR as **Proposed**, cite the evidence, and wait for Accept. That is supersession — not editing the old Decision in place.
+
+Illegal:
+
+- Editing Context / Decision / Consequences of an Accepted ADR.
+- Changing Accepted → Proposed in place.
+- Using `adr new -s` while the replacement is still Proposed (adr-tools immediately unbinds the old ADR).
+
+## Managing Lifecycle
+
+- **Challenge**: Create a Proposed ADR that may note “Proposes to supersede N” without calling `adr new -s`.
+- **Accept**: Human gate. Set Status to Accepted, then apply Supercedes links (same effect as adr-tools `-s`).
+- **Reject**: Mark Proposed as Rejected; leave old Accepted records unchanged.
+- **Linking**: Related decisions should be linked (e.g., "Amends", "Depends on").
+
+## Tools
+
+We use `adr-tools` for numbering, `adr list`, and `adr generate toc`.
+
+**adr-tools quirk:** `adr new` always writes Status **Accepted** (STATUS token substitution). The project wrapper rewrites new records to **Proposed**. Do not pass `-s` at create time; apply supersession only on Accept.

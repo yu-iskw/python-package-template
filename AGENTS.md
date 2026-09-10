@@ -91,6 +91,12 @@ make clean        # Clean build artifacts
 - **Claude Code** automation: [`.claude/`](.claude/) — see [CLAUDE.md](CLAUDE.md) for how Claude loads this repo and the directory layout
 - **Architecture decision records** (ADRs): `docs/adr/`. Use the `manage-adr` skill when the `adr` CLI is installed
 
+### ADR contract (steerable memory)
+
+- Binding set = Status **Accepted** only. Start from `adr list` / `docs/adr/README.md`; do not load the whole tree or paste ADR bodies into this file.
+- If a better approach appears, stop implementing the old decision; use `manage-adr` **Challenge** (Proposed ADR). Do not rewrite an Accepted Decision in place. Do not use `adr new -s` until **Accept**.
+- Leave proposals **Proposed** for a human (draft PR). Use `manage-adr` Accept / Reject only when the user explicitly decides.
+
 ## Common gotchas
 
 - **Do not** add shell wrappers (e.g. `mise-exec.sh`) to call mise; use `mise.toml` `[tasks]` and `mise run`.
@@ -130,7 +136,7 @@ Slash-invoked skills live under [`.claude/skills/<name>/SKILL.md`](.claude/skill
 | `python-upgrade`            | Dependency upgrades with uv                                                 |
 | `security-scan`             | Trivy / OSV / Grype (`make scan-vulnerabilities`); SBOM (`make sbom-check`) |
 | `initialize-project`        | Renaming the template and bootstrapping                                     |
-| `manage-adr`                | ADRs in `docs/adr` (requires `adr` CLI)                                     |
+| `manage-adr`                | ADRs in `docs/adr`: follow / challenge / accept (requires `adr` CLI)        |
 | `postmortem`                | Substantive session end; incidents; skip trivial chore-only sessions        |
 | `problem-solving`           | Single-pass XY-aware analysis and scored comparison (default 5 options)     |
 | `deep-problem-solving`      | Same style of report after **ten** multiple-choice questions (one per turn) |
