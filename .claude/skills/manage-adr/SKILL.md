@@ -38,7 +38,7 @@ Triggers (any one):
 Steps:
 
 1. **Stop** implementing the old decision. Do **not** edit its Decision section.
-2. Create a Proposed ADR (do **not** use `adr new -s`):
+2. Create a Proposed ADR (do **not** use `adr new -s`). `--proposes` targets must be **Accepted** (validated before `adr new`):
 
 ```bash
 .claude/skills/manage-adr/scripts/create-adr.sh --proposes <old-adr-number> "New Decision Title"
@@ -57,7 +57,9 @@ Only when the user (or review) explicitly accepts the proposal:
 .claude/skills/manage-adr/scripts/create-adr.sh accept <adr-number-or-file>
 ```
 
-This sets Status to Accepted and, if the ADR proposes to supersede others, applies Supercedes via `adr link` + `_adr_remove_status` (deferred `-s`). The wrapper refreshes `docs/adr/README.md` when an index already exists.
+Transactional Accept: re-checks propose targets are still Accepted, applies Supercedes via `adr link` + `_adr_remove_status` (adr-tools spelling), then sets Status Accepted and strips Status-only `<!-- adr-proposes:… -->` markers. On link failure, restores backups. Refreshes the existing TOC path (`README.md` or `index.md`) atomically.
+
+Regression harness: `.claude/skills/manage-adr/scripts/test-create-adr.sh`.
 
 If a gotcha in root agent instructions encoded the old decision, update that copy in the **same change**.
 

@@ -10,6 +10,7 @@
 #   create-adr.sh reject <number-or-file>
 #
 # Do NOT pass adr-tools -s at create time; that immediately unbinds the old ADR.
+# Link labels use adr-tools spelling: Supercedes / Superceded by.
 
 set -euo pipefail
 
@@ -24,6 +25,10 @@ fi
 ADR_PATH="$(command -v adr)"
 ADR_BIN="$(dirname "${ADR_PATH}")"
 
+# Marker for Status-only propose targets (never scan Context/Decision prose).
+PROPOSE_MARKER_PREFIX='<!-- adr-proposes:'
+PROPOSE_MARKER_SUFFIX=' -->'
+
 usage() {
 	cat >&2 <<'EOF'
 Usage:
@@ -33,8 +38,10 @@ Usage:
 
 Notes:
   - New ADRs are rewritten from Accepted to Proposed after adr new.
-  - --proposes N adds "Proposes to supersede" prose without calling adr new -s.
-  - accept applies Supercedes via adr link + _adr_remove_status.
+  - --proposes N requires the target Status to be Accepted; validated before adr new.
+  - Status-only markers: <!-- adr-proposes:NNNN-....md --> plus a human Proposes line.
+  - accept applies Supercedes via adr link + _adr_remove_status (transactional).
+  - Link labels match adr-tools: Supercedes / Superceded by (not English "Supersedes").
 EOF
 	exit 2
 }
@@ -82,6 +89,11 @@ resolve_adr_file() {
 		echo "${dir}/${ref}"
 		return
 	fi
+	# Basename-only link targets from markers
+	if [[ -f "${dir}/$(basename "${ref}")" ]]; then
+		echo "${dir}/$(basename "${ref}")"
+		return
+	fi
 	echo "Error: could not resolve ADR reference: ${ref}" >&2
 	exit 1
 }
@@ -92,18 +104,9 @@ adr_number() {
 	echo "$((10#${base%%-*}))"
 }
 
-get_status_line() {
-	# Prefer a single known status token in the Status section.
-	local line
-	if [[ -x "${ADR_BIN}/_adr_status" ]]; then
-		line="$("${ADR_BIN}/_adr_status" "$1" | awk 'NF { print; exit }')"
-	else
-		line="$(awk '
-			BEGIN { in_status=0 }
-			/^## Status$/ { in_status=1; next }
-			in_status && NF { print; exit }
-		' "$1")"
-	fi
+# Normalize Status section first value to a gate token.
+normalize_status_token() {
+	local line="$1"
 	case "${line}" in
 	Proposed | Accepted | Rejected | Deprecated | Superseded)
 		echo "${line}"
@@ -112,31 +115,85 @@ get_status_line() {
 		echo "Superseded"
 		;;
 	*)
-		# Fall back to raw first line for display in errors.
-		echo "${line}"
+		# Bullet form: - **Status:** Accepted
+		local stripped
+		stripped="$(printf '%s\n' "${line}" | sed -E 's/^[[:space:]]*-[[:space:]]*\*\*Status:\*\*[[:space:]]*//; s/^[[:space:]]*\*\*Status:\*\*[[:space:]]*//')"
+		case "${stripped}" in
+		Proposed | Accepted | Rejected | Deprecated | Superseded)
+			echo "${stripped}"
+			;;
+		Superceded\ by\ * | Superseded\ by\ *)
+			echo "Superseded"
+			;;
+		*)
+			echo "${line}"
+			;;
+		esac
 		;;
 	esac
 }
 
-require_proposed() {
+get_status_line() {
 	local file="$1"
-	local action="$2"
+	local line=""
+
+	# Bullet Status (e.g. python docs/adr/0001, template.md)
+	line="$(sed -nE 's/^-[[:space:]]*\*\*Status:\*\*[[:space:]]*(.*)$/\1/p' "${file}" | head -n1)"
+
+	if [[ -z ${line} ]]; then
+		if [[ -x "${ADR_BIN}/_adr_status" ]]; then
+			line="$("${ADR_BIN}/_adr_status" "${file}" | awk 'NF { print; exit }')"
+		else
+			line="$(awk '
+				BEGIN { in_status=0 }
+				/^## Status$/ { in_status=1; next }
+				in_status && NF { print; exit }
+			' "${file}")"
+		fi
+	fi
+
+	normalize_status_token "${line}"
+}
+
+require_status() {
+	local file="$1"
+	local want="$2"
+	local action="$3"
 	local status
 	status="$(get_status_line "${file}")"
-	if [[ ${status} != "Proposed" ]]; then
-		echo "Error: ${action} requires Status Proposed (found: ${status}) in ${file}" >&2
+	if [[ ${status} != "${want}" ]]; then
+		echo "Error: ${action} requires Status ${want} (found: ${status}) in ${file}" >&2
 		exit 1
 	fi
 }
 
+require_proposed() {
+	require_status "$1" "Proposed" "$2"
+}
+
+require_accepted() {
+	require_status "$1" "Accepted" "$2"
+}
+
+# Rewrite Status in either ## Status body line or - **Status:** bullet.
+# Fails if no replacement occurred.
 set_status() {
 	local file="$1"
 	local new_status="$2"
 	local tmp
 	tmp="$(mktemp)"
 	awk -v ns="${new_status}" '
-		BEGIN { in_status=0; replaced=0 }
-		/^## Status$/ { in_status=1; print; next }
+		BEGIN { replaced=0; in_status=0 }
+		/^-[[:space:]]*\*\*Status:\*\*/ {
+			print "- **Status:** " ns
+			replaced=1
+			next
+		}
+		/^## Status$/ {
+			in_status=1
+			print
+			next
+		}
 		in_status && !replaced && NF {
 			print ns
 			replaced=1
@@ -144,19 +201,37 @@ set_status() {
 			next
 		}
 		{ print }
+		END {
+			if (!replaced) {
+				print "Error: set_status: no Status field found to replace" > "/dev/stderr"
+				exit 1
+			}
+		}
 	' "${file}" >"${tmp}"
 	mv "${tmp}" "${file}"
 }
 
-append_proposes_lines() {
+# Append Status-only markers + human Proposes lines after the status value.
+# Args after file are already-resolved ADR file paths.
+append_proposes_markers() {
 	local file="$1"
 	shift
 	[[ $# -eq 0 ]] && return
 
-	local tmp in_status=0 status_seen=0 line t target_file target_base
+	local tmp line in_status=0 status_seen=0 target_file target_base
 	tmp="$(mktemp)"
 	{
 		while IFS= read -r line || [[ -n ${line} ]]; do
+			if [[ ${line} =~ ^-[[:space:]]*\*\*Status:\*\* ]]; then
+				printf '%s\n' "${line}"
+				status_seen=1
+				for target_file in "$@"; do
+					target_base="$(basename "${target_file}")"
+					printf '\n%s%s%s\n' "${PROPOSE_MARKER_PREFIX}" "${target_base}" "${PROPOSE_MARKER_SUFFIX}"
+					printf 'Proposes to supersede [%s](%s)\n' "${target_base%.md}" "${target_base}"
+				done
+				continue
+			fi
 			if [[ ${line} == "## Status" ]]; then
 				in_status=1
 				printf '%s\n' "${line}"
@@ -165,12 +240,12 @@ append_proposes_lines() {
 			if [[ ${in_status} -eq 1 && ${status_seen} -eq 0 && -n ${line} ]]; then
 				printf '%s\n' "${line}"
 				status_seen=1
-				for t in "$@"; do
-					target_file="$(resolve_adr_file "${t}")"
-					target_base="$(basename "${target_file}")"
-					printf '\nProposes to supersede [%s](%s)\n' "${target_base%.md}" "${target_base}"
-				done
 				in_status=0
+				for target_file in "$@"; do
+					target_base="$(basename "${target_file}")"
+					printf '\n%s%s%s\n' "${PROPOSE_MARKER_PREFIX}" "${target_base}" "${PROPOSE_MARKER_SUFFIX}"
+					printf 'Proposes to supersede [%s](%s)\n' "${target_base%.md}" "${target_base}"
+				done
 				continue
 			fi
 			printf '%s\n' "${line}"
@@ -179,8 +254,21 @@ append_proposes_lines() {
 	mv "${tmp}" "${file}"
 }
 
+# Extract propose targets from Status markers only.
 extract_propose_targets() {
-	sed -n 's/.*Proposes to supersede [^[]*\[\([^]]*\)\](\([^)]*\)).*/\2/p' "$1"
+	sed -nE "s/^<!-- adr-proposes:([^ ]+) -->$/\1/p" "$1"
+}
+
+strip_propose_markers() {
+	local file="$1"
+	local tmp
+	tmp="$(mktemp)"
+	awk '
+		/^<!-- adr-proposes:/ { next }
+		/^Proposes to supersede / { next }
+		{ print }
+	' "${file}" >"${tmp}"
+	mv "${tmp}" "${file}"
 }
 
 cmd_create() {
@@ -211,6 +299,16 @@ cmd_create() {
 
 	[[ ${#title_parts[@]} -gt 0 ]] || usage
 
+	local resolved=()
+	local path
+	if [[ ${#proposes[@]} -gt 0 ]]; then
+		for path in "${proposes[@]}"; do
+			path="$(resolve_adr_file "${path}")"
+			require_accepted "${path}" "challenge/propose"
+			resolved+=("${path}")
+		done
+	fi
+
 	local created
 	if ! created="$(adr new "${title_parts[*]}")"; then
 		echo "Error: Failed to create ADR." >&2
@@ -225,8 +323,8 @@ cmd_create() {
 
 	set_status "${created}" "Proposed"
 
-	if [[ ${#proposes[@]} -gt 0 ]]; then
-		append_proposes_lines "${created}" "${proposes[@]}"
+	if [[ ${#resolved[@]} -gt 0 ]]; then
+		append_proposes_markers "${created}" "${resolved[@]}"
 	fi
 
 	echo "${created}"
@@ -241,8 +339,30 @@ apply_supercedes() {
 	old_num="$(adr_number "${old_file}")"
 
 	# Same effect as adr-tools `adr new -s`, deferred until Accept.
+	# Labels match adr-tools spelling (Supercedes / Superceded by).
 	adr link "${new_num}" Supercedes "${old_num}" "Superceded by"
-	"${ADR_BIN}/_adr_remove_status" Accepted "${old_num}"
+	if [[ -x "${ADR_BIN}/_adr_remove_status" ]]; then
+		"${ADR_BIN}/_adr_remove_status" Accepted "${old_num}"
+	fi
+}
+
+refresh_toc() {
+	local dir index tmp
+	dir="$(adr_dir)"
+	if [[ -f "${dir}/README.md" ]]; then
+		index="${dir}/README.md"
+	elif [[ -f "${dir}/index.md" ]]; then
+		index="${dir}/index.md"
+	else
+		return 0
+	fi
+	tmp="$(mktemp)"
+	if adr generate toc >"${tmp}"; then
+		mv "${tmp}" "${index}"
+	else
+		rm -f "${tmp}"
+		echo "Warning: adr generate toc failed; index may be stale." >&2
+	fi
 }
 
 cmd_accept() {
@@ -251,9 +371,6 @@ cmd_accept() {
 	file="$(resolve_adr_file "$1")"
 	require_proposed "${file}" "accept"
 
-	set_status "${file}" "Accepted"
-
-	# Collect targets before stripping propose prose.
 	local targets=()
 	local propose_list
 	propose_list="$(extract_propose_targets "${file}")"
@@ -262,23 +379,53 @@ cmd_accept() {
 		targets+=("${target}")
 	done <<<"${propose_list}"
 
-	local tmp
-	tmp="$(mktemp)"
-	awk '!/Proposes to supersede/' "${file}" >"${tmp}"
-	mv "${tmp}" "${file}"
-
+	# Preflight: each propose target still resolves and is still Accepted.
+	local resolved_targets=()
+	local path
 	for target in "${targets[@]}"; do
-		apply_supercedes "${file}" "${target}"
+		path="$(resolve_adr_file "${target}")"
+		require_accepted "${path}" "accept (propose target)"
+		resolved_targets+=("${path}")
 	done
 
-	# Refresh index when present; warn if generate fails.
-	local dir
-	dir="$(adr_dir)"
-	if [[ -f "${dir}/README.md" || -f "${dir}/index.md" ]]; then
-		if ! adr generate toc >"${dir}/README.md"; then
-			echo "Warning: adr generate toc failed; index may be stale." >&2
+	# Transactional accept: backup all touched files; restore on any failure.
+	local backup_dir adr_parent
+	backup_dir="$(mktemp -d)"
+	adr_parent="$(cd "$(dirname "${file}")" && pwd)"
+
+	_accept_rollback() {
+		local status=$?
+		trap - ERR EXIT
+		if [[ ${status} -ne 0 && -d ${backup_dir} ]]; then
+			local f base
+			for f in "${backup_dir}"/*; do
+				[[ -f ${f} ]] || continue
+				base="$(basename "${f}")"
+				cp -f "${f}" "${adr_parent}/${base}"
+			done
+			echo "Error: accept failed; restored ADR backups" >&2
 		fi
-	fi
+		rm -rf "${backup_dir}"
+		exit "${status}"
+	}
+	trap _accept_rollback ERR EXIT
+
+	cp -f "${file}" "${backup_dir}/$(basename "${file}")"
+	for path in "${resolved_targets[@]}"; do
+		cp -f "${path}" "${backup_dir}/$(basename "${path}")"
+	done
+
+	# Prefer link/supersede while still Proposed, then flip to Accepted.
+	for path in "${resolved_targets[@]}"; do
+		apply_supercedes "${file}" "${path}"
+	done
+
+	set_status "${file}" "Accepted"
+	strip_propose_markers "${file}"
+	refresh_toc
+
+	trap - ERR EXIT
+	rm -rf "${backup_dir}"
 
 	echo "${file}"
 }
